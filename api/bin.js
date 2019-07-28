@@ -63,7 +63,7 @@ cfg.port = process.env.GUMCAST_port || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
 
 assert(cfg.client_id, 'client_id is required')
-assert(cfg.client_id, 'client_secret is required')
+assert(cfg.client_secret, 'client_secret is required')
 assert(cfg.oAuthUrl, 'oAuthUrl is required')
 assert(cfg.port, 'port is required')
 

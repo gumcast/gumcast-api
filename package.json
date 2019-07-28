@@ -1,26 +1,11 @@
 {
   "name": "gumcast",
-  "version": "0.0.0",
   "description": "A service for generating rss feeds from gumroad subscriptions",
-  "main": "index.js",
-  "scripts": {
-    "start": "./api/bin.js",
-    "dev": "nodemon ./api/bin.js -- --config ./config.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bcomnes/gumcast.git"
-  },
-  "keywords": [],
+  "version": "0.0.0",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io/)",
-  "license": "MIT",
+  "bin": "api/bin.js",
   "bugs": {
     "url": "https://github.com/bcomnes/gumcast/issues"
-  },
-  "homepage": "https://github.com/bcomnes/gumcast#readme",
-  "devDependencies": {
-    "nodemon": "^1.19.1",
-    "standard": "^13.1.0"
   },
   "dependencies": {
     "cliclopts": "^1.1.1",
@@ -29,5 +14,30 @@
     "minimist": "^1.2.0",
     "morgan": "^1.9.1",
     "nanoassert": "^2.0.0"
+  },
+  "devDependencies": {
+    "dependency-check": "^4.0.0",
+    "nodemon": "^1.19.1",
+    "npm-run-all": "^4.1.5",
+    "standard": "^13.1.0",
+    "tape": "^4.11.0"
+  },
+  "homepage": "https://github.com/bcomnes/gumcast#readme",
+  "keywords": [
+    "gumroad",
+    "podcast"
+  ],
+  "license": "MIT",
+  "main": "servr",
+  "private": "true",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcomnes/gumcast.git"
+  },
+  "scripts": {
+    "dev": "nodemon ./api/bin.js -- --config ./config.json",
+    "start": "./api/bin.js",
+    "test": "run-s test:*",
+    "test:tape": "tape api/**/*.test.js"
   }
 }
