@@ -12,11 +12,11 @@ exports.createRouter = function createRouter (cfg) {
 }
 
 function login (req, res) {
-  res.end('Hello world')
+  throw new Error('Foo bar')
 }
 
 function products (req, res) {
-  res.end('Hello world')
+  res.end('hello world')
 }
 
 function jsonfeed (req, res) {
