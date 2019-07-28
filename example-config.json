@@ -1,4 +1,5 @@
 {
   "client_id": null,
-  "client_secret": null
+  "client_secret": null,
+  "nodeEnv": "development"
 }
