@@ -1,0 +1,33 @@
+{
+  "name": "gumcast",
+  "version": "0.0.0",
+  "description": "A service for generating rss feeds from gumroad subscriptions",
+  "main": "index.js",
+  "scripts": {
+    "start": "./api/bin.js",
+    "dev": "nodemon ./api/bin.js -- --config ./config.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcomnes/gumcast.git"
+  },
+  "keywords": [],
+  "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bcomnes/gumcast/issues"
+  },
+  "homepage": "https://github.com/bcomnes/gumcast#readme",
+  "devDependencies": {
+    "nodemon": "^1.19.1",
+    "standard": "^13.1.0"
+  },
+  "dependencies": {
+    "cliclopts": "^1.1.1",
+    "finalhandler": "^1.1.2",
+    "http-hash-router": "^2.0.1",
+    "minimist": "^1.2.0",
+    "morgan": "^1.9.1",
+    "nanoassert": "^2.0.0"
+  }
+}
