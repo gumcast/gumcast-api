@@ -59,7 +59,7 @@ if (argv.config) {
 cfg.client_id = process.env.GUMCAST_CLIENT_ID || cfg.client_id
 cfg.client_secret = process.env.GUMCAST_CLIENT_SECRET || cfg.client_secret
 cfg.oAuthUrl = process.env.GUMCAST_OAUTH_URL || cfg.oAuthUrl
-cfg.port = process.env.GUMCAST_port || cfg.port
+cfg.port = process.env.PORT || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
 
 assert(cfg.client_id, 'client_id is required')
