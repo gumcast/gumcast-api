@@ -1,5 +1,6 @@
 {
   "client_id": null,
   "client_secret": null,
+  "mobile_token": null,
   "nodeEnv": "development"
 }

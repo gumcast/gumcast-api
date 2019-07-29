@@ -58,12 +58,14 @@ if (argv.config) {
 
 cfg.client_id = process.env.GUMCAST_CLIENT_ID || cfg.client_id
 cfg.client_secret = process.env.GUMCAST_CLIENT_SECRET || cfg.client_secret
+cfg.mobile_token = process.env.GUMCAST_MOBILE_TOKEN || cfg.mobile_token
 cfg.oAuthUrl = process.env.GUMCAST_OAUTH_URL || cfg.oAuthUrl
 cfg.port = process.env.PORT || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
 
 assert(cfg.client_id, 'client_id is required')
 assert(cfg.client_secret, 'client_secret is required')
+assert(cfg.mobile_token, 'mobile_token is required')
 assert(cfg.oAuthUrl, 'oAuthUrl is required')
 assert(cfg.port, 'port is required')
 

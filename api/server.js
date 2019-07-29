@@ -12,15 +12,16 @@ exports.createServer = function createServer (cfg) {
       env: cfg.nodeEnv
     })
 
-    logger(req, res, function (err) {
-      if (err) return done(err)
+    logger(req, res, runRouter)
 
+    function runRouter (err) {
+      if (err) return done(err)
       try {
         router(req, res, {}, done)
       } catch (e) {
         done(e)
       }
-    })
+    }
   })
 
   return server
@@ -29,3 +30,6 @@ exports.createServer = function createServer (cfg) {
 function errorHandler (err) {
   if (err.statusCode !== 404) console.error(err)
 }
+
+// CORS
+// https://gist.github.com/balupton/3696140
