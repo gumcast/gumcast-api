@@ -3,40 +3,29 @@ const bent = require('bent')
 const formurlencoded = require('form-urlencoded').default
 const bodyParser = require('body-parser')
 const qs = require('qs')
+const { pMiddleware, hashRoute } = require('p-connect')
+const parseurl = require('parseurl')
 
 exports.createRouter = function createRouter (cfg) {
   const router = HttpHashRouter()
 
   router.set('/login', {
-    POST: p(login(cfg))
+    POST: hashRoute(login(cfg))
   })
-  router.set('/products', p(products(cfg)))
-  router.set('/jsonfeed', p(jsonfeed(cfg)))
-  router.set('/rss', p(rss(cfg)))
+  router.set('/products', {
+    GET: hashRoute(products(cfg))
+  })
+  router.set('/jsonfeed', {
+    GET: hashRoute(jsonfeed(cfg))
+  })
+  router.set('/rss', {
+    GET: hashRoute(rss(cfg))
+  })
 
   return router
 }
 
-// Promise route
-function p (route) {
-  return (req, res, opts, done) => {
-    route(req, res, opts).then(() => done(null)).catch(done)
-  }
-}
-
-// Promise middleware
-function pMw (mw) {
-  return (req, res) => {
-    return new Promise((resolve, reject) => {
-      mw(req, res, (err) => {
-        if (err) reject(err)
-        else resolve()
-      })
-    })
-  }
-}
-
-const jsonBp = pMw(bodyParser.json())
+const json = pMiddleware(bodyParser.json())
 
 function login (cfg) {
   const post = bent(cfg.oAuthUrl, 'POST', 'json', 200, {
@@ -53,13 +42,14 @@ function login (cfg) {
 
   return async (req, res, opts) => {
     res.setHeader('content-type', 'application/json')
-    await jsonBp(req, res)
+    await json(req, res)
     if (!validate(req.body)) {
       res.statusCode = 400
-      res.write(JSON.stringify({
+      const errBody = JSON.stringify({
         error: 'Request didn\'t validate'
-      }))
-      return res.end()
+      })
+      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+      return res.end(errBody)
     }
 
     const formData = formurlencoded({
@@ -74,9 +64,11 @@ function login (cfg) {
     try {
       const tokenBundle = await post('/token', formData)
       res.statusCode = 200
-      res.end(JSON.stringify(tokenBundle))
+      const resBody = JSON.stringify(tokenBundle)
+      res.setHeader('Content-Length', Buffer.byteLength(resBody, 'utf8'))
+      res.end(resBody)
     } catch (e) {
-      return apiErroHandler(req, res, e)
+      return apiErrorHandler(req, res, e)
     }
   }
 }
@@ -88,21 +80,22 @@ function products (cfg) {
     return true
   }
 
-  return async (req, res) => {
+  return async (req, res, opts) => {
     res.setHeader('content-type', 'application/json')
-    // const query = qs.parse((new url.URL(req.url)).search, { ignoreQueryPrefix: true })
-    await jsonBp(req, res)
-    if (!validate(req.body)) {
+    const url = parseurl(req)
+    const query = qs.parse(url.query)
+    if (!validate(query)) {
       res.statusCode = 400
-      res.write(JSON.stringify({
+      const errBody = JSON.stringify({
         error: 'Missing access_token in body'
-      }))
-      return res.end()
+      })
+      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+      return res.end(errBody)
     }
 
     const get = bent('https://gumroad.com/api/mobile/', 'GET', 'json', 200, {
       accept: 'application/json',
-      Authorization: 'Bearer ' + req.body.access_token
+      Authorization: 'Bearer ' + query.access_token
     })
 
     const params = {
@@ -112,16 +105,18 @@ function products (cfg) {
     }
 
     try {
-      const purchacedItems = await get(`/purchases/index.json?${qs.stringify(params)}`)
+      const purchasedItems = await get(`/purchases/index.json?${qs.stringify(params)}`)
       res.statusCode = 200
-      res.end(JSON.stringify(purchacedItems))
+      const resBody = JSON.stringify(purchasedItems)
+      res.setHeader('Content-Length', Buffer.byteLength(resBody, 'utf8'))
+      res.end(resBody)
     } catch (e) {
-      return apiErroHandler(req, res, e)
+      return apiErrorHandler(req, res, e)
     }
   }
 }
 
-async function apiErroHandler (req, res, e) {
+async function apiErrorHandler (req, res, e) {
   if (e.statusCode && e.message && e.responseBody) {
     res.statusCode = e.statusCode
     res.statusMessage = e.message
