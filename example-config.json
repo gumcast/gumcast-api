@@ -2,5 +2,6 @@
   "client_id": null,
   "client_secret": null,
   "mobile_token": null,
-  "nodeEnv": "development"
+  "nodeEnv": "development",
+  "mobileApiUrl": "https://gumroad.com/api/mobile/"
 }

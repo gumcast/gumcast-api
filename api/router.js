@@ -93,7 +93,7 @@ function products (cfg) {
       return res.end(errBody)
     }
 
-    const get = bent('https://gumroad.com/api/mobile/', 'GET', 'json', 200, {
+    const get = bent(cfg.mobileApiUrl, 'GET', 'json', 200, {
       accept: 'application/json',
       Authorization: 'Bearer ' + query.access_token
     })
