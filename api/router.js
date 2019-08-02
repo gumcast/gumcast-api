@@ -1,7 +1,7 @@
-const HttpHashRouter = require('http-hash-router')
-const bent = require('bent')
-const formurlencoded = require('form-urlencoded').default
-const bodyParser = require('body-parser')
+const HttpHashRouter = require('http-hash-router');
+const bent = require('bent');
+const formurlencoded = require('form-urlencoded').default;
+const bodyParser = require('body-parser');
 const qs = require('qs')
 const { pMiddleware, hashRoute } = require('p-connect')
 const parseurl = require('parseurl')
@@ -116,6 +116,54 @@ function products (cfg) {
   }
 }
 
+function jsonfeed (cfg) {
+  function validate (query) {
+    if (!query) return false
+    if (!query.access_token) return false
+    if (!query.refresh_token) return false
+    return true
+  }
+
+  return async (req, res) => {
+    res.setHeader('content-type', 'application/json')
+    const url = parseurl(req)
+    const query = qs.parse(url.query)
+    if (!validate(query)) {
+      res.statusCode = 400
+      const errBody = JSON.stringify({
+        error: 'Missing access_token in body'
+      })
+      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+      return res.end(errBody)
+    }
+    res.end('hello world')
+  }
+}
+
+function rss (cfg) {
+  function validate (query) {
+    if (!query) return false
+    if (!query.access_token) return false
+    if (!query.refresh_token) return false
+    return true
+  }
+
+  return async (req, res) => {
+    res.setHeader('content-type', 'application/json')
+    const url = parseurl(req)
+    const query = qs.parse(url.query)
+    if (!validate(query)) {
+      res.statusCode = 400
+      const errBody = JSON.stringify({
+        error: 'Missing access_token in body'
+      })
+      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+      return res.end(errBody)
+    }
+    res.end('hello world')
+  }
+}
+
 async function apiErrorHandler (req, res, e) {
   if (e.statusCode && e.message && e.responseBody) {
     res.statusCode = e.statusCode
@@ -125,17 +173,5 @@ async function apiErrorHandler (req, res, e) {
     res.end(body)
   } else {
     throw e
-  }
-}
-
-function jsonfeed (cfg) {
-  return async (req, res) => {
-    res.end('hello world')
-  }
-}
-
-function rss (cfg) {
-  return async (req, res) => {
-    res.end('hello world')
   }
 }

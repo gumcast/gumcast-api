@@ -1,0 +1,84 @@
+{
+  "success": true,
+  "products": [
+   {
+    "name": "OAuth 2.0 Simplified First Edition (Paperback + PDF)",
+    "unique_permalink": "dRihH",
+    "description": "\n\n\n\n\n\n\n\n\n<p>For a limited time, take advantage of this 50% off price, and receive the PDF edition as well!<br></p><p><br></p><p>OAuth 2.0 Simplified is a guide to building an OAuth 2.0 server. Through high-level overviews, step-by-step instructions, and real-world examples, you will learn how to take advantage of the OAuth 2.0 framework while building a secure API.</p><p><br></p><p>This discounted price is only available to orders shipped within the US. If you are outside the US, you can order the print book here:&nbsp;http://www.lulu.com/shop/aaron-parecki/oauth-20-simplified/paperback/product-23628969.html</p>\n\n\n\n\n\n\n\n\n",
+    "created_at": "2018-05-10T15:06:53Z",
+    "updated_at": "2019-06-10T20:57:03Z",
+    "creator_name": "Aaron Parecki",
+    "preview_url": "https://static-2.gumroad.com/res/gumroad/1641616341313/asset_previews/efa600ed4184a68a4f1100556c77b665/retina/oauth-2-simplified-sale.jpg",
+    "preview_oembed_url": "",
+    "preview_height": 400,
+    "preview_width": 670,
+    "url_redirect_external_id": "NkQEGq5y9Hcym4Tjs2LTXg==",
+    "file_data": [
+     {
+      "name": "oauth-2-simplified-pub.pdf",
+      "size": 3818056,
+      "filetype": "pdf",
+      "filegroup": "document",
+      "id": "QXHy3kZ4hlGbU31G6JzUTg==",
+      "created_at": "2018-05-10T16:28:58Z",
+      "name_displayable": "oauth-2-simplified-pub",
+      "download_url": "https://gumroad.com/api/mobile/url_redirects/download/redated"
+     }
+    ],
+    "purchase_id": "8cnnAm7nDcHIp5UWy4ZeTQ==",
+    "purchased_at": "2018-05-18T19:18:10Z",
+    "user_id": "1267668955061",
+    "product_updates_data": []
+   },
+   {
+    "name": "Uber's Undoing eBook",
+    "unique_permalink": "INYq",
+    "description": "\n\n\n\n\n\n\n\n\n\n\n\n<p>Eli Schiff's definitive story of Uber Design under Travis Kalanick's leadership and beyond. Covering everything from Uber’s ever-shifting philosophy to their icon, logo and typeface design.</p><p><br></p><p>Update: All previous and new purchases will get an editable Sketch file with all consecutive Uber icons since the beginning!</p><p><br></p><p>More info here:&nbsp;http://www.elischiff.com/blog/2018/10/10/ubers-undoing-part-i-whipping-boy</p>\n\n\n\n\n\n\n\n\n\n\n\n",
+    "created_at": "2018-10-08T15:21:03Z",
+    "updated_at": "2019-06-24T23:10:33Z",
+    "creator_name": "elischiff",
+    "preview_url": "https://static-2.gumroad.com/res/gumroad/8335183284598/asset_previews/3a4918656613014daf0d29d22d332e6b/retina/Header1_402x_402x.png",
+    "preview_oembed_url": "",
+    "preview_height": 351,
+    "preview_width": 670,
+    "url_redirect_external_id": "ERMq2tsdzg--BD6rQkthKg==",
+    "file_data": [
+     {
+      "name": "Uber's Undoing eBook.zip",
+      "size": 68999817,
+      "filetype": "zip",
+      "filegroup": "archive",
+      "id": "7JNBL86rWj_kWwBOYxU-2A==",
+      "created_at": "2018-10-14T20:04:09Z",
+      "name_displayable": "Uber's Undoing eBook",
+      "download_url": "https://gumroad.com/api/mobile/url_redirects/download/redacted"
+     },
+     {
+      "name": "Uber Icon Construction Sketch.sketch",
+      "size": 286416,
+      "filetype": "sketch",
+      "filegroup": "url",
+      "id": "Isfc5353TVK_tQY4BmSVsw==",
+      "created_at": "2018-10-17T02:55:11Z",
+      "name_displayable": "Uber Icon Construction Sketch",
+      "download_url": "https://gumroad.com/api/mobile/url_redirects/download/redacted"
+     }
+    ],
+    "purchase_id": "7vvS02eBjHXfPeUhKxjq8A==",
+    "purchased_at": "2018-10-15T04:56:01Z",
+    "user_id": "1267668955061",
+    "product_updates_data": [
+     {
+      "files_data": [],
+      "message": "<p>A big thanks for your dedication in buying the book early. I have an update for you.</p><p>You'll now get access to hand-reproduced Sketch files for every version of the Uber icon—made from scratch. Get a visceral view of what visual decisions were made in the icon construction.</p><p>Thanks again for your support.</p><p>Eli</p><p>PS. If there's any trouble downloading the file, feel free to reach out. (It should be available on the screen where you downloaded the ebook as a separate file).</p>",
+      "name": "Uber's Undoing Update",
+      "installment_type": "product",
+      "published_at": "2018-10-17T05:00:01Z",
+      "external_id": "OF24hs9sF7o3EOJpUlRJyQ==",
+      "url_redirect_external_id": "rFMRVcIL_t6ZPinaVwEkQQ=="
+     }
+    ]
+   }
+  ],
+  "user_id": "1267668955061"
+ }
