@@ -6,7 +6,9 @@ const morgan = require('morgan')
 exports.createServer = function createServer (cfg) {
   const logger = morgan('dev')
   const router = createRouter(cfg)
-  const server = http.createServer((req, res) => {
+  const server = http.createServer(handler)
+
+  function handler (req, res) {
     const done = finalhandler(req, res, {
       onerror: errorHandler,
       env: cfg.nodeEnv
@@ -22,7 +24,7 @@ exports.createServer = function createServer (cfg) {
         done(e)
       }
     }
-  })
+  }
 
   return server
 }

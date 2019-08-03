@@ -22,12 +22,12 @@ function getProductPermalink (product) {
 }
 
 const gumroadFaviconSvg = 'https://assets.gumroad.com/assets/logo-70cc6d4c5ab29be1bae97811585bc664524cd99897327ec47a67a76a6f69be91.svg'
-const gumroadFavicon = 'https://gumroad.com/favicon.ico'
+// const gumroadFavicon = 'https://gumroad.com/favicon.ico'
 
 exports.getJsonfeed = getJsonfeed
 function getJsonfeed (data, opts = {}) {
   const {
-    purchaseId,
+    purchase_id: purchaseId,
     feed_url
   } = opts
   const product = getPurchace(data, purchaseId)
