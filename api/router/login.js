@@ -1,7 +1,7 @@
 const bodyParser = require('body-parser')
 const { pMiddleware, hashRoute } = require('p-connect')
 
-const { apiErrorHandler } = require('./helpers.js')
+const { apiErrorHandler, validationFailed } = require('./helpers.js')
 const { getAccessTokenFromPassword } = require('../gumroad-client.js')
 
 const json = pMiddleware(bodyParser.json())
@@ -9,23 +9,18 @@ const json = pMiddleware(bodyParser.json())
 module.exports = cfg => hashRoute(login(cfg))
 function login (cfg) {
   function validate (body) {
-    if (!body) return false
-    if (!body.username) return false
-    if (!body.password) return false
+    if (!body) return 'Missing body'
+    if (!body.username) return 'Missing username'
+    if (!body.password) return 'Missing password'
     return true
   }
 
   return async (req, res, opts) => {
     res.setHeader('content-type', 'application/json')
     await json(req, res)
-    if (!validate(req.body)) {
-      res.statusCode = 400
-      const errBody = JSON.stringify({
-        error: 'Request didn\'t validate'
-      })
-      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
-      return res.end(errBody)
-    }
+
+    const invalidMsg = validate(req.body)
+    if (invalidMsg) return validationFailed(req, invalidMsg)
 
     try {
       const tokenBundle = getAccessTokenFromPassword({

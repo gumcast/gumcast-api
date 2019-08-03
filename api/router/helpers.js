@@ -10,3 +10,13 @@ async function apiErrorHandler (req, res, e) {
     throw e
   }
 }
+
+exports.validationFailed = validationFailed
+async function validationFailed (res, msg) {
+  res.statusCode = 400
+  const errBody = JSON.stringify({
+    error: msg
+  })
+  res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+  return res.end(errBody)
+}
