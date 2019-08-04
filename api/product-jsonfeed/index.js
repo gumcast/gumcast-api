@@ -71,7 +71,7 @@ function getJsonfeed (data, opts = {}) {
         date_published: item.created_at,
         attachments: [{
           url: item.download_url,
-          // mime_type: mimeType(item),
+          mime_type: mimeType(item),
           title: item.name_displayable,
           size_in_bytes: item.size
         }],
