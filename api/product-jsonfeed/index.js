@@ -76,7 +76,7 @@ function getJsonfeed (data, opts = {}) {
           size_in_bytes: item.size
         }],
         _itunes: {
-          episode: i
+          episode: i + 1
         }
       }))
       .reverse()
