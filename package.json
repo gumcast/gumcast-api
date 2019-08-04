@@ -1,5 +1,5 @@
 {
-  "name": "gumcast",
+  "name": "gumcast-api",
   "description": "A service for generating rss feeds from gumroad subscriptions",
   "version": "0.0.0",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io/)",

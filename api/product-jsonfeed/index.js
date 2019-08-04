@@ -51,8 +51,7 @@ function getJsonfeed (data, opts = {}) {
       avatar: product.preview_url
     },
     _itunes: {
-      expired: !product.file_data,
-      block: true
+      expired: !product.file_data
       // new_feed_url, TODO: for refresh token?,
     },
     expired: !product.file_data,
