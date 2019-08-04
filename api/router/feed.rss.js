@@ -37,7 +37,7 @@ function rssFeed (cfg) {
         purchase_id: query.purchase_id
       })
 
-      const rss = getRssFeed(purchasedItems, {
+      const rss = await getRssFeed(purchasedItems, {
         purchase_id: query.purchase_id,
         feed_url: `https://${cfg.hostname}/feed.json?${params}`
       })

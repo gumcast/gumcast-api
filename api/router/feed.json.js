@@ -35,7 +35,7 @@ function jsonfeed (cfg) {
         purchase_id: query.purchase_id
       })
 
-      const jf = getJsonfeed(purchasedItems, {
+      const jf = await getJsonfeed(purchasedItems, {
         purchase_id: query.purchase_id,
         feed_url: `https://${cfg.hostname}/feed.json?${params}`
       })

@@ -4,6 +4,10 @@ const jsonfeedToRSS = require('jsonfeed-to-rss')
 const striptags = require('striptags')
 const trimRight = require('trim-right')
 const trimLeft = require('trim-left')
+const pMap = require('p-map')
+const redirectChain = require('redirect-chain')({
+  maxRedirects: 3
+})
 
 exports.getPurchace = getPurchace
 function getPurchace (data, purchaseId) {
@@ -29,12 +33,12 @@ const gumroadFaviconSvg = 'https://assets.gumroad.com/assets/logo-70cc6d4c5ab29b
 
 function mimeType (item) {
   if (item.filetype === 'm4a' && item.filegroup === 'audio') return 'audio/mp4a-latm'
-  if (item.filetype === 'mp3' && item.filegroup === 'audio') return 'audio/mpeg'
+  if (item.filetype === 'mp3' && item.filegroup === 'audio') return 'audio/mpeg '
   return `${item.filegroup}/${item.filetype}`
 }
 
 exports.getJsonfeed = getJsonfeed
-function getJsonfeed (data, opts = {}) {
+async function getJsonfeed (data, opts = {}) {
   const {
     purchase_id: purchaseId,
     feed_url
@@ -82,11 +86,16 @@ function getJsonfeed (data, opts = {}) {
       .reverse()
   }
 
+  jsonfeed.items = await pMap(jsonfeed.items, async (item) => {
+    item.attachments[0].url = await redirectChain.destination(item.attachments[0].url)
+    return item
+  }, { concurrency: 10 })
+
   return jsonfeed
 }
 
 exports.getRssFeed = getRssFeed
-function getRssFeed (data, opts = {}) {
-  const jf = getJsonfeed(data, opts)
+async function getRssFeed (data, opts = {}) {
+  const jf = await getJsonfeed(data, opts)
   return jsonfeedToRSS(jf)
 }
