@@ -26,7 +26,7 @@ test('Get permalink', t => {
 
 test('Generate jsonfeed', t => {
   const jf = getJsonfeed(data, {
-    purchaseId: '7vvS02eBjHXfPeUhKxjq8A==',
+    purchase_id: '7vvS02eBjHXfPeUhKxjq8A==',
     feed_url: `https://gumcast.com/feed.json?authToken=1234&refreshToken=1234&productId=1234`
   })
 
@@ -39,7 +39,7 @@ test('Generate jsonfeed', t => {
 
 test('Generate rss feed', t => {
   const rss = getRssFeed(data, {
-    purchaseId: '7vvS02eBjHXfPeUhKxjq8A==',
+    purchase_id: '7vvS02eBjHXfPeUhKxjq8A==',
     feed_url: `https://gumcast.com/feed.rss?authToken=1234&refreshToken=1234&productId=1234`
   })
 
