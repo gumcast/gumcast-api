@@ -28,7 +28,7 @@ const gumroadFaviconSvg = 'https://assets.gumroad.com/assets/logo-70cc6d4c5ab29b
 // const gumroadFavicon = 'https://gumroad.com/favicon.ico'
 
 function mimeType (item) {
-  if (item.filetype === 'm4a' && item.filegroup === 'audio') return 'audio/mp4'
+  if (item.filetype === 'm4a' && item.filegroup === 'audio') return 'audio/mp4a-latm'
   if (item.filetype === 'mp3' && item.filegroup === 'audio') return 'audio/mpeg'
   return `${item.filegroup}/${item.filetype}`
 }
