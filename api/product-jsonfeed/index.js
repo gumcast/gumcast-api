@@ -58,7 +58,6 @@ function getJsonfeed (data, opts = {}) {
     items: product.file_data
       .map((item, i) => ({
         id: item.id,
-        url: home_page_url,
         title: item.name_displayable,
         content_text: item.name_displayable,
         image: product.preview_url,
