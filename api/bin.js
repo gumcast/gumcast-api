@@ -63,6 +63,7 @@ cfg.oAuthUrl = process.env.GUMCAST_OAUTH_URL || cfg.oAuthUrl
 cfg.mobileApiUrl = process.env.GUMCAST_MOBILE_API_URL || cfg.mobileApiUrl
 cfg.port = process.env.PORT || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
+cfg.hostname = process.env.GUMCAST_HOSTNAME || cfg.hostname
 
 assert(cfg.client_id, 'client_id is required')
 assert(cfg.client_secret, 'client_secret is required')

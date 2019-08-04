@@ -5,7 +5,7 @@
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io/)",
   "bin": "api/bin.js",
   "bugs": {
-    "url": "https://github.com/bcomnes/gumcast/issues"
+    "url": "https://github.com/bcomnes/gumcast-api/issues"
   },
   "dependencies": {
     "bent": "^1.6.0",
@@ -32,7 +32,7 @@
     "standard": "^13.1.0",
     "tape": "^4.11.0"
   },
-  "homepage": "https://github.com/bcomnes/gumcast#readme",
+  "homepage": "https://github.com/bcomnes/gumcast-api#readme",
   "keywords": [
     "gumroad",
     "podcast"
@@ -42,7 +42,7 @@
   "private": "true",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bcomnes/gumcast.git"
+    "url": "git+https://github.com/bcomnes/gumcast-api.git"
   },
   "scripts": {
     "dev": "nodemon ./api/bin.js -- --config ./config.json",
@@ -50,7 +50,7 @@
     "dev:client": "budo client/index.js",
     "start": "./api/bin.js",
     "test": "run-s test:*",
-    "test:tape": "tape api/**/*.test.js",
+    "test:api": "tape api/**/*.test.js",
     "test:deps": "dependency-check package.json api/bin --verbose --no-dev"
   }
 }
