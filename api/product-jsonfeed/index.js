@@ -34,7 +34,7 @@ function getJsonfeed (data, opts = {}) {
     feed_url
   } = opts
   const product = getPurchace(data, purchaseId)
-  if (!product) return null
+  if (!product) throw new Error('purchace_id not found')
   const home_page_url = getProductPermalink(product)
 
   const jsonfeed = {
