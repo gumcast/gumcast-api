@@ -19,7 +19,7 @@ exports.getProductPermalink = getProductPermalink
 function getProductPermalink (product) {
   const downloadURL = product['file_data'][0].download_url
   const u = new url.URL(downloadURL)
-  console.log(u.pathname.split('/'))
+
   const permalinkId = u.pathname.split('/')[5]
   return `https://gumroad.com/d/${permalinkId}`
 }
