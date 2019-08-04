@@ -1,6 +1,9 @@
 /* eslint-disable camelcase */
 const url = require('url')
 const jsonfeedToRSS = require('jsonfeed-to-rss')
+const striptags = require('striptags')
+const trimRight = require('trim-right')
+const trimLeft = require('trim-left')
 
 exports.getPurchace = getPurchace
 function getPurchace (data, purchaseId) {
@@ -32,14 +35,14 @@ function getJsonfeed (data, opts = {}) {
   } = opts
   const product = getPurchace(data, purchaseId)
   if (!product) return null
-  const home_page_url = `https://gumroad.com/d/${purchaseId}`
+  const home_page_url = getProductPermalink(product)
 
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',
     title: product.name,
     home_page_url,
     feed_url,
-    description: product.description,
+    description: trimRight(trimLeft(striptags(product.description))),
     user_comment: `Feed generated and delivered by gumcast.com`,
     icon: product.preview_url || gumroadFaviconSvg,
     favicon: gumroadFaviconSvg,
@@ -53,24 +56,26 @@ function getJsonfeed (data, opts = {}) {
       // new_feed_url, TODO: for refresh token?,
     },
     expired: !product.file_data,
-    items: product.file_data.map((item, i) => ({
-      id: item.id,
-      url: home_page_url,
-      title: item.name_displayable,
-      content_text: item.name_displayable,
-      image: product.preview_url,
-      banner_image: product.preview_url,
-      date_published: item.created_at,
-      attachments: [{
-        url: item.download_url,
-        mime_type: `${item.filegroup}/${item.filetype}`,
+    items: product.file_data
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .map((item, i) => ({
+        id: item.id,
+        url: home_page_url,
         title: item.name_displayable,
-        size_in_bytes: item.size
-      }],
-      _itunes: {
-        episode: i
-      }
-    }))
+        content_text: item.name_displayable,
+        image: product.preview_url,
+        banner_image: product.preview_url,
+        date_published: item.created_at,
+        attachments: [{
+          url: item.download_url,
+          mime_type: `${item.filegroup}/${item.filetype}`,
+          title: item.name_displayable,
+          size_in_bytes: item.size
+        }],
+        _itunes: {
+          episode: i
+        }
+      }))
   }
 
   return jsonfeed

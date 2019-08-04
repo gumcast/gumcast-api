@@ -3,7 +3,7 @@ const parseurl = require('parseurl')
 const qs = require('qs')
 const { getJsonfeed } = require('../product-jsonfeed')
 const { getProducts } = require('../gumroad-client')
-const { validationFailed, apiErrorHandler } = require('./helpers')
+const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
 
 module.exports = cfg => hashRoute(jsonfeed(cfg))
 function jsonfeed (cfg) {
@@ -16,11 +16,10 @@ function jsonfeed (cfg) {
   }
 
   return async (req, res) => {
-    res.setHeader('content-type', 'application/json')
     const url = parseurl(req)
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
-    if (invalidMsg) return validationFailed(res, invalidMsg)
+    if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
       const purchasedItems = await getProducts({
@@ -41,10 +40,7 @@ function jsonfeed (cfg) {
         feed_url: `https://${cfg.hostname}/feed.json?${params}`
       })
 
-      res.statusCode = 200
-      const resBody = JSON.stringify(jf)
-      res.setHeader('Content-Length', Buffer.byteLength(resBody, 'utf8'))
-      return res.end(resBody)
+      return writeBody(res, JSON.stringify(jf, null, ' '))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

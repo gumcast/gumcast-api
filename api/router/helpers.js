@@ -1,3 +1,5 @@
+const assert = require('nanoassert')
+
 exports.apiErrorHandler = apiErrorHandler
 async function apiErrorHandler (req, res, e) {
   if (e.statusCode && e.message && e.responseBody) {
@@ -12,11 +14,25 @@ async function apiErrorHandler (req, res, e) {
 }
 
 exports.validationFailed = validationFailed
-async function validationFailed (res, msg) {
+async function validationFailed (req, res, msg) {
+  res.setHeader('content-type', 'application/json')
   res.statusCode = 400
   const errBody = JSON.stringify({
     error: msg
   })
   res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
   return res.end(errBody)
+}
+
+exports.writeBody = writeBody
+function writeBody (res, body, statusCode = 200, contentType = 'application/json') {
+  assert(res)
+  assert(body)
+  assert(statusCode)
+  assert(contentType)
+
+  res.setHeader('content-type', contentType)
+  res.statusCode = statusCode
+  res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+  return res.end(body)
 }

@@ -3,7 +3,7 @@ const parseurl = require('parseurl')
 const qs = require('qs')
 const { getRssFeed } = require('../product-jsonfeed')
 const { getProducts } = require('../gumroad-client')
-const { validationFailed, apiErrorHandler } = require('./helpers')
+const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
 
 module.exports = cfg => hashRoute(rssFeed(cfg))
 function rssFeed (cfg) {
@@ -20,8 +20,7 @@ function rssFeed (cfg) {
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
     if (invalidMsg) {
-      res.setHeader('content-type', 'application/json')
-      return validationFailed(res, invalidMsg)
+      return validationFailed(req, res, invalidMsg)
     }
 
     try {
@@ -42,11 +41,7 @@ function rssFeed (cfg) {
         purchase_id: query.purchase_id,
         feed_url: `https://${cfg.hostname}/feed.json?${params}`
       })
-      res.setHeader('content-type', 'application/rss+xml')
-      res.statusCode = 200
-
-      res.setHeader('Content-Length', Buffer.byteLength(rss, 'utf8'))
-      return res.end(rss)
+      return writeBody(res, rss, 200, 'application/rss+xml')
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

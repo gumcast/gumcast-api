@@ -4,7 +4,7 @@ const parseurl = require('parseurl')
 const qs = require('qs')
 const { getProducts } = require('../gumroad-client.js')
 
-const { apiErrorHandler, validationFailed } = require('./helpers.js')
+const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
 
 module.exports = cfg => hashRoute(products(cfg))
 function products (cfg) {
@@ -15,11 +15,11 @@ function products (cfg) {
   }
 
   return async (req, res, opts) => {
-    res.setHeader('content-type', 'application/json')
     const url = parseurl(req)
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
-    if (invalidMsg) return validationFailed(res, invalidMsg)
+
+    if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
       const purchasedItems = await getProducts({
@@ -28,10 +28,8 @@ function products (cfg) {
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl
       })
-      res.statusCode = 200
-      const resBody = JSON.stringify(purchasedItems)
-      res.setHeader('Content-Length', Buffer.byteLength(resBody, 'utf8'))
-      res.end(resBody)
+
+      return writeBody(res, JSON.stringify(purchasedItems))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

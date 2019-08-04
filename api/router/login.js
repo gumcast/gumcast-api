@@ -1,7 +1,7 @@
 const bodyParser = require('body-parser')
 const { pMiddleware, hashRoute } = require('p-connect')
 
-const { apiErrorHandler, validationFailed } = require('./helpers.js')
+const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
 const { getAccessTokenFromPassword } = require('../gumroad-client.js')
 
 const json = pMiddleware(bodyParser.json())
@@ -12,18 +12,17 @@ function login (cfg) {
     if (!body) return 'Missing body'
     if (!body.username) return 'Missing username'
     if (!body.password) return 'Missing password'
-    return true
+    return null
   }
 
   return async (req, res, opts) => {
-    res.setHeader('content-type', 'application/json')
     await json(req, res)
 
     const invalidMsg = validate(req.body)
-    if (invalidMsg) return validationFailed(req, invalidMsg)
+    if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
-      const tokenBundle = getAccessTokenFromPassword({
+      const tokenBundle = await getAccessTokenFromPassword({
         oAuthUrl: cfg.oAuthUrl,
         client_id: cfg.client_id,
         username: req.body.username,
@@ -31,10 +30,7 @@ function login (cfg) {
         client_secret: cfg.client_secret
       })
 
-      res.statusCode = 200
-      const resBody = JSON.stringify(tokenBundle)
-      res.setHeader('Content-Length', Buffer.byteLength(resBody, 'utf8'))
-      return res.end(resBody)
+      return writeBody(res, JSON.stringify(tokenBundle))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }
