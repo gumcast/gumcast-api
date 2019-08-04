@@ -56,7 +56,6 @@ function getJsonfeed (data, opts = {}) {
     },
     expired: !product.file_data,
     items: product.file_data
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .map((item, i) => ({
         id: item.id,
         url: home_page_url,
@@ -75,6 +74,7 @@ function getJsonfeed (data, opts = {}) {
           episode: i
         }
       }))
+      .reverse()
   }
 
   return jsonfeed
