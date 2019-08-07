@@ -84,6 +84,9 @@ server.on('error', err => {
 
 server.listen(cfg.port)
 
-process.once('SIGINT', function () {
+process.once('SIGINT', quit)
+process.once('SIGTERM', quit)
+
+function quit () {
   server.close(() => process.exit())
-})
+}
