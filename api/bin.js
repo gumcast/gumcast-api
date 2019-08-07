@@ -88,5 +88,8 @@ process.once('SIGINT', quit)
 process.once('SIGTERM', quit)
 
 function quit () {
-  server.close(() => process.exit())
+  server.close(() => {
+    console.log('server gracefully shutdown')
+    process.exit(0)
+  })
 }

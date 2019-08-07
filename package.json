@@ -53,6 +53,6 @@
     "start": "./api/bin.js",
     "test": "run-s test:*",
     "test:api": "tape api/**/*.test.js",
-    "test:deps": "dependency-check package.json api/bin --verbose"
+    "test:deps": "dependency-check package.json api/bin --verbose --no-dev"
   }
 }
