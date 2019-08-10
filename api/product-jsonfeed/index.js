@@ -114,19 +114,6 @@ async function getJsonfeed (data, opts = {}) {
           mime_type: mimeType(item),
           title: item.name_displayable,
           size_in_bytes: item.size
-        },
-        {
-          url: getFileUrl({
-            purchase_id,
-            access_token,
-            refresh_token,
-            file_id: item.id,
-            hostname,
-            rootpath
-          }),
-          mime_type: mimeType(item),
-          title: item.name_displayable,
-          size_in_bytes: item.size
         }],
         _itunes: {
           episode: i + 1
