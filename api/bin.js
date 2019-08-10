@@ -72,6 +72,8 @@ assert(cfg.oAuthUrl, 'oAuthUrl is required')
 assert(cfg.mobileApiUrl, 'mobileApiUrl is required')
 assert(cfg.port, 'port is required')
 
+if (cfg.nodeEnv !== 'production') console.log('RUNNING IN DEBUG MODE')
+
 const server = createServer(cfg)
 
 server.once('listening', () => {

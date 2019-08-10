@@ -4,8 +4,8 @@ const bent = require('bent')
 const formurlencoded = require('form-urlencoded').default
 const assert = require('nanoassert')
 
-exports.getProducts = getProducts
-async function getProducts ({
+exports.getPurchaces = getPurchaces
+async function getPurchaces ({
   access_token,
   refresh_token,
   mobile_token,

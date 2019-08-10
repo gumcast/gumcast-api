@@ -1,9 +1,9 @@
 const test = require('tape')
 const data = require('./test-data.json')
-const { productsWithFileData, getPurchace, getProductPermalink, getJsonfeed, getRssFeed } = require('./index.js')
+const { purchacesWithFileData, getPurchace, getPurchacePermalink, getJsonfeed, getRssFeed } = require('./index.js')
 
-test('getProductsWithFiles', t => {
-  const productsWithFiles = productsWithFileData(data)
+test('purchacesWithFileData', t => {
+  const productsWithFiles = purchacesWithFileData(data)
 
   for (const product of productsWithFiles) {
     t.true(product['file_data'].length > 0, `${product.name} has file_data`)
@@ -19,7 +19,7 @@ test('Get specific purchase', t => {
 
 test('Get permalink', t => {
   const uberBook = getPurchace(data, '7vvS02eBjHXfPeUhKxjq8A==')
-  const permalink = getProductPermalink(uberBook)
+  const permalink = getPurchacePermalink(uberBook)
   t.equal(permalink, 'https://gumroad.com/d/redacted', 'retrieved correct permalink')
   t.end()
 })

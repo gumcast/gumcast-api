@@ -2,7 +2,7 @@
 const { hashRoute } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
-const { getProducts } = require('../gumroad-client.js')
+const { getPurchaces } = require('../gumroad-client.js')
 
 const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
 
@@ -22,7 +22,7 @@ function products (cfg) {
     if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
-      const purchasedItems = await getProducts({
+      const purchasedItems = await getPurchaces({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,

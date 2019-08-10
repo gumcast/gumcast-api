@@ -4,6 +4,7 @@ const login = require('./login')
 const products = require('./products')
 const jsonFeed = require('./feed.json.js')
 const rss = require('./feed.rss.js')
+const { getFile, headFile } = require('./file')
 
 exports.createRouter = function createRouter (cfg) {
   const router = HttpHashRouter()
@@ -12,6 +13,10 @@ exports.createRouter = function createRouter (cfg) {
   router.set('/products', { GET: products(cfg) })
   router.set('/feed.json', { GET: jsonFeed(cfg) })
   router.set('/feed.rss', { GET: rss(cfg) })
+  router.set('/file', {
+    GET: getFile(cfg),
+    HEAD: headFile(cfg)
+  })
 
   return router
 }

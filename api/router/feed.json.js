@@ -2,7 +2,7 @@ const { hashRoute } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
 const { getJsonfeed } = require('../product-jsonfeed')
-const { getProducts } = require('../gumroad-client')
+const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
 
 module.exports = cfg => hashRoute(jsonfeed(cfg))
@@ -22,22 +22,18 @@ function jsonfeed (cfg) {
     if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
-      const purchasedItems = await getProducts({
+      const purchasedItems = await getPurchaces({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl
       })
 
-      const params = qs.stringify({
-        access_token: query.access_token,
-        refresh_token: query.refresh_token,
-        purchase_id: query.purchase_id
-      })
-
-      const jf = await getJsonfeed(purchasedItems, {
+      const jf = getJsonfeed(purchasedItems, {
         purchase_id: query.purchase_id,
-        feed_url: `https://${cfg.hostname}/feed.json?${params}`
+        access_token: query.access_token,
+        refresh_token: query.access_token,
+        hostname: cfg.hostname
       })
 
       return writeBody(res, JSON.stringify(jf, null, ' '))
