@@ -145,6 +145,6 @@ async function getJsonfeed (data, opts = {}) {
 
 exports.getRssFeed = getRssFeed
 async function getRssFeed (data, opts = {}) {
-  const jf = getJsonfeed(data, opts)
+  const jf = await getJsonfeed(data, opts)
   return jsonfeedToRSS(jf)
 }
