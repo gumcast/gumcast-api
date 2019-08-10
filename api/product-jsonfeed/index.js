@@ -49,7 +49,7 @@ function getFileUrl ({
   hostname
 }) {
   const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id })
-  return `https://${hostname}/files?${query}`
+  return `https://${hostname}/file?${query}`
 }
 
 function getJsonFeedUrl ({
