@@ -66,7 +66,6 @@ async function get (url) {
       timeout: 10000 // 10 seconds
     }, (err, res) => {
       if (err) return reject(err)
-      res.end()
       return resolve(res)
     })
   })
