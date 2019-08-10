@@ -36,14 +36,14 @@ function getFile (cfg) {
 
       const purchace = getPurchace(purchasedItems, query.purchase_id)
       if (!purchace) {
-        return writeBody(res, JSON.stringify({
+        return writeBody(req, res, JSON.stringify({
           error: `purchace_id ${query.purchace_id} not found`
         }), 404)
       }
 
       const file = getFileFrom(purchace, query.file_id)
       if (!file) {
-        return writeBody(res, JSON.stringify({
+        return writeBody(req, res, JSON.stringify({
           error: `file_id ${query.file_id} not found`
         }), 404)
       }
@@ -100,14 +100,14 @@ function headFile (cfg) {
 
       const purchace = getPurchace(purchasedItems, query.purchase_id)
       if (!purchace) {
-        return writeBody(res, JSON.stringify({
+        return writeBody(req, res, JSON.stringify({
           error: `purchace_id ${query.purchace_id} not found`
         }), 404)
       }
 
       const file = getFileFrom(purchace, query.file_id)
       if (!file) {
-        return writeBody(res, JSON.stringify({
+        return writeBody(req, res, JSON.stringify({
           error: `file_id ${query.file_id} not found`
         }), 404)
       }

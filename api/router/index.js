@@ -11,8 +11,8 @@ exports.createRouter = function createRouter (cfg) {
 
   router.set('/login', { POST: login(cfg) })
   router.set('/products', { GET: products(cfg) })
-  router.set('/feed.json', { GET: jsonFeed(cfg) })
-  router.set('/feed.rss', { GET: rss(cfg) })
+  router.set('/feed.json', { GET: jsonFeed(cfg), HEAD: jsonFeed(cfg) })
+  router.set('/feed.rss', { GET: rss(cfg), HEAD: rss(cfg) })
   router.set('/file', {
     GET: getFile(cfg),
     HEAD: headFile(cfg)

@@ -37,7 +37,7 @@ function jsonfeed (cfg) {
         rootpath: cfg.rootpath
       })
 
-      return writeBody(res, JSON.stringify(jf, null, ' '))
+      return writeBody(req, res, JSON.stringify(jf, null, ' '))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

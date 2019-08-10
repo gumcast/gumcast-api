@@ -29,7 +29,7 @@ function products (cfg) {
         mobileApiUrl: cfg.mobileApiUrl
       })
 
-      return writeBody(res, JSON.stringify(purchasedItems))
+      return writeBody(req, res, JSON.stringify(purchasedItems))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

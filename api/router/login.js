@@ -30,7 +30,7 @@ function login (cfg) {
         client_secret: cfg.client_secret
       })
 
-      return writeBody(res, JSON.stringify(tokenBundle))
+      return writeBody(req, res, JSON.stringify(tokenBundle))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

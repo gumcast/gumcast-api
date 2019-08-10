@@ -25,7 +25,8 @@ async function validationFailed (req, res, msg) {
 }
 
 exports.writeBody = writeBody
-function writeBody (res, body, statusCode = 200, contentType = 'application/json') {
+function writeBody (req, res, body, statusCode = 200, contentType = 'application/json') {
+  assert(req)
   assert(res)
   assert(body)
   assert(statusCode)
@@ -34,5 +35,5 @@ function writeBody (res, body, statusCode = 200, contentType = 'application/json
   res.setHeader('content-type', contentType)
   res.statusCode = statusCode
   res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
-  return res.end(body)
+  return res.end(req.method === 'HEAD' ? null : body)
 }

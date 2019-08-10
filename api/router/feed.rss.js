@@ -38,7 +38,7 @@ function rssFeed (cfg) {
         hostname: cfg.hostname,
         rootpath: cfg.rootpath
       })
-      return writeBody(res, rss, 200, 'application/rss+xml')
+      return writeBody(req, res, rss, 200, 'application/rss+xml')
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }
