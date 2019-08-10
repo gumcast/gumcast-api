@@ -31,7 +31,7 @@ function rssFeed (cfg) {
         mobileApiUrl: cfg.mobileApiUrl
       })
 
-      const rss = getRssFeed(purchasedItems, {
+      const rss = await getRssFeed(purchasedItems, {
         purchase_id: query.purchase_id,
         access_token: query.access_token,
         refresh_token: query.access_token,

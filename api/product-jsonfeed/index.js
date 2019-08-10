@@ -5,8 +5,9 @@ const striptags = require('striptags')
 const trimRight = require('trim-right')
 const trimLeft = require('trim-left')
 const assert = require('nanoassert')
-// const pMap = require('p-map')
+const pMap = require('p-map')
 const qs = require('qs')
+const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 
 exports.getPurchace = getPurchace
 function getPurchace (data, purchaseId) {
@@ -65,7 +66,7 @@ function getJsonFeedUrl ({
 }
 
 exports.getJsonfeed = getJsonfeed
-function getJsonfeed (data, opts = {}) {
+async function getJsonfeed (data, opts = {}) {
   const {
     purchase_id,
     access_token,
@@ -109,6 +110,12 @@ function getJsonfeed (data, opts = {}) {
         banner_image: purchace.preview_url,
         date_published: item.created_at,
         attachments: [{
+          url: item.download_url,
+          mime_type: mimeType(item),
+          title: item.name_displayable,
+          size_in_bytes: item.size
+        },
+        {
           url: getFileUrl({
             purchase_id,
             access_token,
@@ -128,11 +135,16 @@ function getJsonfeed (data, opts = {}) {
       .reverse()
   }
 
+  jsonfeed.items = await pMap(jsonfeed.items, async (item) => {
+    item.attachments[0].url = await redirectChain.destination(item.attachments[0].url)
+    return item
+  }, { concurrency: 10 })
+
   return jsonfeed
 }
 
 exports.getRssFeed = getRssFeed
-function getRssFeed (data, opts = {}) {
+async function getRssFeed (data, opts = {}) {
   const jf = getJsonfeed(data, opts)
   return jsonfeedToRSS(jf)
 }
