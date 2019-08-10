@@ -46,20 +46,22 @@ function getFileUrl ({
   access_token,
   refresh_token,
   file_id,
-  hostname
+  hostname,
+  rootpath
 }) {
   const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id })
-  return `https://${hostname}/file?${query}`
+  return `https://${hostname}${rootpath}/file?${query}`
 }
 
 function getJsonFeedUrl ({
   purchase_id,
   access_token,
   refresh_token,
-  hostname
+  hostname,
+  rootpath
 }) {
   const query = qs.stringify({ access_token, refresh_token, purchase_id })
-  return `https://${hostname}/feed.json?${query}`
+  return `https://${hostname}${rootpath}/feed.json?${query}`
 }
 
 exports.getJsonfeed = getJsonfeed
@@ -68,12 +70,14 @@ function getJsonfeed (data, opts = {}) {
     purchase_id,
     access_token,
     refresh_token,
-    hostname
+    hostname,
+    rootpath
   } = opts
   assert(purchase_id)
   assert(access_token)
   assert(refresh_token)
   assert(hostname)
+  assert(rootpath)
   const purchace = getPurchace(data, purchase_id)
   if (!purchace) throw new Error('purchace_id not found')
   const home_page_url = getPurchacePermalink(purchace)
@@ -82,7 +86,7 @@ function getJsonfeed (data, opts = {}) {
     version: 'https://jsonfeed.org/version/1',
     title: purchace.name,
     home_page_url,
-    feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname }),
+    feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }),
     description: trimRight(trimLeft(striptags(purchace.description))),
     user_comment: `Feed generated and delivered by gumcast.com`,
     icon: purchace.preview_url || gumroadFaviconSvg,
@@ -110,7 +114,8 @@ function getJsonfeed (data, opts = {}) {
             access_token,
             refresh_token,
             file_id: item.id,
-            hostname
+            hostname,
+            rootpath
           }),
           mime_type: mimeType(item),
           title: item.name_displayable,

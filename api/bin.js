@@ -64,6 +64,7 @@ cfg.mobileApiUrl = process.env.GUMCAST_MOBILE_API_URL || cfg.mobileApiUrl
 cfg.port = process.env.PORT || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
 cfg.hostname = process.env.GUMCAST_HOSTNAME || cfg.hostname
+cfg.rootpath = process.env.GUMCAST_ROOTPATH || cfg.rootpath
 
 assert(cfg.client_id, 'client_id is required')
 assert(cfg.client_secret, 'client_secret is required')
@@ -71,6 +72,7 @@ assert(cfg.mobile_token, 'mobile_token is required')
 assert(cfg.oAuthUrl, 'oAuthUrl is required')
 assert(cfg.mobileApiUrl, 'mobileApiUrl is required')
 assert(cfg.port, 'port is required')
+assert(cfg.rootpath, 'rootpath is required')
 
 if (cfg.nodeEnv !== 'production') console.log('RUNNING IN DEBUG MODE')
 

@@ -35,7 +35,8 @@ function rssFeed (cfg) {
         purchase_id: query.purchase_id,
         access_token: query.access_token,
         refresh_token: query.access_token,
-        hostname: cfg.hostname
+        hostname: cfg.hostname,
+        rootpath: cfg.rootpath
       })
       return writeBody(res, rss, 200, 'application/rss+xml')
     } catch (e) {

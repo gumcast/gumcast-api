@@ -33,7 +33,8 @@ function jsonfeed (cfg) {
         purchase_id: query.purchase_id,
         access_token: query.access_token,
         refresh_token: query.access_token,
-        hostname: cfg.hostname
+        hostname: cfg.hostname,
+        rootpath: cfg.rootpath
       })
 
       return writeBody(res, JSON.stringify(jf, null, ' '))
