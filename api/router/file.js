@@ -10,7 +10,19 @@ const httpProxy = require('http-proxy')
 exports.fileProxy = cfg => hashRoute(fileProxy(cfg))
 function fileProxy (cfg) {
   const proxy = httpProxy.createProxyServer()
-  proxy.on('error', e => console.error(e))
+  proxy.on('error', e => console.log(e))
+
+  proxy.on('proxyRes', function (proxyRes, req, res) {
+    console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2))
+  })
+  proxy.on('open', function (proxySocket) {
+  // listen for messages coming FROM the target here
+    proxySocket.on('data', console.log)
+  })
+  proxy.on('close', function (res, socket, head) {
+  // view disconnected websocket connections
+    console.log('Client disconnected')
+  })
   function validate (query) {
     if (!query) return 'Missing querystring'
     if (!query.access_token) return 'Missing access_token'
@@ -37,8 +49,6 @@ function fileProxy (cfg) {
     if (invalidParamMsg) {
       return validationFailed(req, res, invalidParamMsg)
     }
-    console.log('Request headers')
-    console.log(req.headers)
 
     try {
       const purchasedItems = await getPurchaces({
@@ -64,7 +74,10 @@ function fileProxy (cfg) {
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
 
-      proxy.web(req, res, { target: tmpFileUrl })
+      proxy.web(req, res, {
+        target: tmpFileUrl,
+        changeOrigin: true
+      })
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

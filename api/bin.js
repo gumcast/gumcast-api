@@ -85,7 +85,7 @@ server.once('listening', () => {
 })
 
 server.on('error', err => {
-  if (err.statusCode !== 404) console.error(err)
+  if (err.statusCode !== 404) console.log(err)
 })
 
 server.listen(cfg.port)

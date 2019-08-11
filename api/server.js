@@ -30,7 +30,7 @@ exports.createServer = function createServer (cfg) {
 }
 
 function errorHandler (err) {
-  if (err.statusCode !== 404) console.error(err)
+  if (err.statusCode !== 404) console.log(err)
 }
 
 // CORS
