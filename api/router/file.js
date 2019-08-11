@@ -12,9 +12,6 @@ exports.fileProxy = cfg => hashRoute(fileProxy(cfg))
 function fileProxy (cfg) {
   const proxy = httpProxy.createProxyServer()
   proxy.asyncProxy = promisify(proxy.web)
-  proxy.on('proxyRes', function (proxyRes, req, res) {
-    console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2))
-  })
 
   function validate (query) {
     if (!query) return 'Missing querystring'
@@ -32,9 +29,6 @@ function fileProxy (cfg) {
   }
 
   return async (req, res, { params }) => {
-    console.log('REQUEST HEADERS')
-    console.log(req.method)
-    console.log(req.headers)
     const url = parseurl(req)
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
