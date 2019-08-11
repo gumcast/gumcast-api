@@ -5,12 +5,15 @@ const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
 const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
-const simpleGet = require('simple-get')
-const promisify = require('util.promisify')
-const pump = promisify(require('pump'))
+const httpProxy = require('http-proxy')
 
 exports.fileProxy = cfg => hashRoute(fileProxy(cfg))
 function fileProxy (cfg) {
+  const proxy = httpProxy()
+  proxy.on('error', e => {
+    console.error(e)
+  })
+
   function validate (query) {
     if (!query) return 'Missing querystring'
     if (!query.access_token) return 'Missing access_token'
@@ -64,31 +67,9 @@ function fileProxy (cfg) {
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
 
-      const fileProxyResponse = await get(tmpFileUrl, req.method, req.headers)
-      console.log('Response headers')
-      console.log(fileProxyResponse.headers)
-      res.writeHead(fileProxyResponse.statusCode, fileProxyResponse.headers)
-      if (req.method !== 'HEAD') {
-        await pump(fileProxyResponse, res)
-      } else {
-        fileProxyResponse.destroy()
-        return res.end()
-      }
+      proxy.web(req, res, { target: tmpFileUrl })
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }
   }
-}
-
-async function get (url, method, headers) {
-  return new Promise((resolve, reject) => {
-    simpleGet({
-      url,
-      method,
-      timeout: 10000 // 10 seconds
-    }, (err, res) => {
-      if (err) return reject(err)
-      return resolve(res)
-    })
-  })
 }
