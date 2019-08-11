@@ -27,7 +27,6 @@ function fileProxy (cfg) {
   }
 
   return async (req, res, { params }) => {
-    console.log(params)
     const url = parseurl(req)
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
@@ -38,6 +37,8 @@ function fileProxy (cfg) {
     if (invalidParamMsg) {
       return validationFailed(req, res, invalidParamMsg)
     }
+    console.log('Request headers')
+    console.log(req.headers)
 
     try {
       const purchasedItems = await getPurchaces({
@@ -64,8 +65,14 @@ function fileProxy (cfg) {
       const tmpFileUrl = await redirectChain.destination(file.download_url)
 
       const fileProxyResponse = await get(tmpFileUrl, req.method, req.headers)
+      console.log('Response headers')
+      console.log(fileProxyResponse.headers)
       res.writeHead(fileProxyResponse.statusCode, fileProxyResponse.headers)
-      await pump(fileProxyResponse, res)
+      if (req.method !== 'HEAD') {
+        await pump(fileProxyResponse, res)
+      } else {
+        res.end()
+      }
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }
