@@ -26,8 +26,7 @@
     "redirect-chain": "^1.0.1",
     "striptags": "^3.1.1",
     "trim-left": "^1.0.1",
-    "trim-right": "^1.0.1",
-    "util.promisify": "^1.0.0"
+    "trim-right": "^1.0.1"
   },
   "devDependencies": {
     "dependency-check": "^4.0.0",
