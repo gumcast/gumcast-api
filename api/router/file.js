@@ -71,7 +71,8 @@ function fileProxy (cfg) {
       if (req.method !== 'HEAD') {
         await pump(fileProxyResponse, res)
       } else {
-        res.end()
+        fileProxyResponse.destroy()
+        return res.end()
       }
     } catch (e) {
       return apiErrorHandler(req, res, e)
