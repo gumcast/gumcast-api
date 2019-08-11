@@ -6,14 +6,11 @@ const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
 const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 const httpProxy = require('http-proxy')
+const promisify = require('util.promisify')
 
 exports.fileProxy = cfg => hashRoute(fileProxy(cfg))
 function fileProxy (cfg) {
-  const proxy = httpProxy()
-  proxy.on('error', e => {
-    console.error(e)
-  })
-
+  const proxy = httpProxy.createProxyServer()
   function validate (query) {
     if (!query) return 'Missing querystring'
     if (!query.access_token) return 'Missing access_token'
@@ -67,7 +64,7 @@ function fileProxy (cfg) {
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
 
-      proxy.web(req, res, { target: tmpFileUrl })
+      await promisify(proxy.web(req, res, { target: tmpFileUrl }))
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }
