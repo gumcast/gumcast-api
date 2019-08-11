@@ -37,7 +37,7 @@ function getFileFrom (purchace, fileId) {
 }
 
 function mimeType (item) {
-  if (item.filetype === 'm4a' && item.filegroup === 'audio') return 'audio/mp4a-latm'
+  if (item.filetype === 'm4a' && item.filegroup === 'audio') return 'audio/m4a'
   if (item.filetype === 'mp3' && item.filegroup === 'audio') return 'audio/mpeg '
   return `${item.filegroup}/${item.filetype}`
 }
