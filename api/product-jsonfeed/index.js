@@ -135,7 +135,7 @@ async function getJsonfeed (data, opts = {}) {
           name: item.name
         })
       } else {
-        feedItem.attachments[0].url = await redirectChain.destination(item.attachments[0].url)
+        feedItem.attachments[0].url = await redirectChain.destination(feedItem.attachments[0].url)
       }
 
       return feedItem
