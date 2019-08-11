@@ -13,10 +13,7 @@ exports.createRouter = function createRouter (cfg) {
   router.set('/products', { GET: products(cfg) })
   router.set('/feed.json', { GET: jsonFeed(cfg), HEAD: jsonFeed(cfg) })
   router.set('/feed.rss', { GET: rss(cfg), HEAD: rss(cfg) })
-  router.set('/file/:name', {
-    GET: fileProxy(cfg),
-    HEAD: fileProxy(cfg)
-  })
+  router.set('/file/:name', fileProxy(cfg))
 
   return router
 }
