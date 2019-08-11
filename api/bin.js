@@ -65,6 +65,7 @@ cfg.port = process.env.PORT || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
 cfg.hostname = process.env.GUMCAST_HOSTNAME || cfg.hostname
 cfg.rootpath = process.env.GUMCAST_ROOTPATH || cfg.rootpath
+cfg.fileProxyHost = process.env.GUMCAST_FILE_PROXY_HOST || cfg.fileProxyHost || cfg.hostname + cfg.rootpath
 
 assert(cfg.client_id, 'client_id is required')
 assert(cfg.client_secret, 'client_secret is required')
@@ -73,6 +74,7 @@ assert(cfg.oAuthUrl, 'oAuthUrl is required')
 assert(cfg.mobileApiUrl, 'mobileApiUrl is required')
 assert(cfg.port, 'port is required')
 assert(cfg.rootpath, 'rootpath is required')
+assert(cfg.fileProxyHost, 'fileProxyHost is required')
 
 if (cfg.nodeEnv !== 'production') console.log('RUNNING IN DEBUG MODE')
 

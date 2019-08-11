@@ -47,11 +47,14 @@ function getFileUrl ({
   access_token,
   refresh_token,
   file_id,
-  hostname,
-  rootpath
+  fileProxyHost,
+  name
 }) {
   const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id })
-  return `https://${hostname}${rootpath}/file?${query}`
+  const base = `https://${fileProxyHost}`
+  const pathQuery = `/file/${name}?${query}`
+  const u = new url.URL(pathQuery, base)
+  return u.toString()
 }
 
 function getJsonFeedUrl ({
@@ -72,7 +75,9 @@ async function getJsonfeed (data, opts = {}) {
     access_token,
     refresh_token,
     hostname,
-    rootpath
+    rootpath,
+    proxyFiles,
+    fileProxyHost
   } = opts
   assert(purchase_id)
   assert(access_token)
@@ -101,8 +106,8 @@ async function getJsonfeed (data, opts = {}) {
       // new_feed_url, TODO: for refresh token?,
     },
     expired: !purchace.file_data,
-    items: purchace.file_data
-      .map((item, i) => ({
+    items: await pMap(purchace.file_data, async (item, i) => {
+      const feedItem = {
         id: item.id,
         title: item.name_displayable,
         content_text: item.name_displayable,
@@ -118,14 +123,26 @@ async function getJsonfeed (data, opts = {}) {
         _itunes: {
           episode: i + 1
         }
-      }))
-      .reverse()
+      }
+
+      if (proxyFiles) {
+        feedItem.attachments[0].url = getFileUrl({
+          purchase_id,
+          access_token,
+          refresh_token,
+          file_id: item.id,
+          fileProxyHost,
+          name: item.name
+        })
+      } else {
+        feedItem.attachments[0].url = await redirectChain.destination(item.attachments[0].url)
+      }
+
+      return feedItem
+    }, { concurrency: 10 })
   }
 
-  jsonfeed.items = await pMap(jsonfeed.items, async (item) => {
-    item.attachments[0].url = await redirectChain.destination(item.attachments[0].url)
-    return item
-  }, { concurrency: 10 })
+  jsonfeed.items = jsonfeed.items.reverse()
 
   return jsonfeed
 }

@@ -4,7 +4,7 @@ const login = require('./login')
 const products = require('./products')
 const jsonFeed = require('./feed.json.js')
 const rss = require('./feed.rss.js')
-const { getFile, headFile } = require('./file')
+const { fileProxy } = require('./file')
 
 exports.createRouter = function createRouter (cfg) {
   const router = HttpHashRouter()
@@ -13,9 +13,9 @@ exports.createRouter = function createRouter (cfg) {
   router.set('/products', { GET: products(cfg) })
   router.set('/feed.json', { GET: jsonFeed(cfg), HEAD: jsonFeed(cfg) })
   router.set('/feed.rss', { GET: rss(cfg), HEAD: rss(cfg) })
-  router.set('/file', {
-    GET: getFile(cfg),
-    HEAD: headFile(cfg)
+  router.set('/file/:name', {
+    GET: fileProxy(cfg),
+    HEAD: fileProxy(cfg)
   })
 
   return router

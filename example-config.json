@@ -3,5 +3,8 @@
   "client_secret": null,
   "mobile_token": null,
   "nodeEnv": "development",
-  "mobileApiUrl": "https://gumroad.com/api/mobile/"
+  "mobileApiUrl": null,
+  "hostname": "localhost:8080",
+  "rootpath": "",
+  "fileProxyHost": null
 }
