@@ -83,7 +83,7 @@ async function getJsonfeed (data, opts = {}) {
   assert(access_token)
   assert(refresh_token)
   assert(hostname)
-  assert(rootpath)
+  assert(rootpath != null)
   const purchace = getPurchace(data, purchase_id)
   if (!purchace) throw new Error('purchace_id not found')
   const home_page_url = getPurchacePermalink(purchace)

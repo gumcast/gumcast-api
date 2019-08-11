@@ -73,7 +73,7 @@ assert(cfg.mobile_token, 'mobile_token is required')
 assert(cfg.oAuthUrl, 'oAuthUrl is required')
 assert(cfg.mobileApiUrl, 'mobileApiUrl is required')
 assert(cfg.port, 'port is required')
-assert(cfg.rootpath, 'rootpath is required')
+assert(cfg.rootpath != null, 'rootpath is required')
 assert(cfg.fileProxyHost, 'fileProxyHost is required')
 
 if (cfg.nodeEnv !== 'production') console.log('RUNNING IN DEBUG MODE')
