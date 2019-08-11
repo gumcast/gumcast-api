@@ -73,10 +73,10 @@ function fileProxy (cfg) {
       }
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
-
       proxy.web(req, res, {
         target: tmpFileUrl,
-        changeOrigin: true
+        changeOrigin: true,
+        ignorePath: true
       })
     } catch (e) {
       return apiErrorHandler(req, res, e)
