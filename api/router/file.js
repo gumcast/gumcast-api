@@ -6,10 +6,12 @@ const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
 const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 const httpProxy = require('http-proxy')
+const promisify = require('util.promisify')
 
 exports.fileProxy = cfg => hashRoute(fileProxy(cfg))
 function fileProxy (cfg) {
   const proxy = httpProxy.createProxyServer()
+  proxy.asyncProxy = promisify(proxy.web)
   proxy.on('error', e => console.log(e))
 
   proxy.on('proxyRes', function (proxyRes, req, res) {
@@ -73,10 +75,10 @@ function fileProxy (cfg) {
       }
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
-      proxy.web(req, res, {
+
+      return proxy.asyncProxy(req, res, {
         target: tmpFileUrl,
-        changeOrigin: true,
-        ignorePath: true
+        changeOrigin: true
       })
     } catch (e) {
       return apiErrorHandler(req, res, e)
