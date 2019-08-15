@@ -66,7 +66,8 @@ function fileProxy (cfg) {
 
       return proxy.asyncProxy(req, res, {
         target: tmpFileUrl,
-        changeOrigin: true
+        changeOrigin: true,
+        ignorePath: true
       })
     } catch (e) {
       return apiErrorHandler(req, res, e)
