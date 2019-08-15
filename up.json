@@ -6,6 +6,6 @@
     "NODE_ENV": "production"
   },
   "proxy": {
-    "command": "node api/bin.js --config ./config.json",
+    "command": "node api/bin.js --config ./config.json"
   }
 }
