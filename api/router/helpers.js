@@ -37,3 +37,8 @@ function writeBody (req, res, body, statusCode = 200, contentType = 'application
   res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
   return res.end(req.method === 'HEAD' ? null : body)
 }
+
+exports.writeJSON = writeJSON
+function writeJSON (req, res, obj, statusCode = 200) {
+  return writeBody(req, res, JSON.stringify(obj, null, ' '), statusCode, 'application/json')
+}

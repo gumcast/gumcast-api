@@ -5,10 +5,19 @@ const products = require('./products')
 const jsonFeed = require('./feed.json.js')
 const rss = require('./feed.rss.js')
 const { fileProxy } = require('./file')
+const { writeJSON } = require('./helpers.js')
+const pkg = require('../../package.json')
 
 exports.createRouter = function createRouter (cfg) {
   const router = HttpHashRouter()
 
+  router.set('/', (req, res, opts) => {
+    writeJSON(req, res, {
+      name: pkg.name,
+      version: pkg.version,
+      hello: 'world'
+    })
+  })
   router.set('/login', { POST: login(cfg) })
   router.set('/products', { GET: products(cfg) })
   router.set('/feed.json', { GET: jsonFeed(cfg), HEAD: jsonFeed(cfg) })
