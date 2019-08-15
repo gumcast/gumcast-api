@@ -6,7 +6,8 @@
     "NODE_ENV": "development"
   },
   "proxy": {
-    "command": "node api/bin.js --config ./config.json"
+    "command": "node api/bin.js --config ./config.json",
+    "timeout": 25
   },
   "stages": {
     "production": {
