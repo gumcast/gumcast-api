@@ -7,7 +7,8 @@
   },
   "proxy": {
     "command": "node api/bin.js --config ./config.json",
-    "timeout": 25
+    "timeout": 25,
+    "memory": 3008
   },
   "stages": {
     "production": {

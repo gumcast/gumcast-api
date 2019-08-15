@@ -2,7 +2,7 @@ const { hashRoute } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
 const { getPurchaces } = require('../gumroad-client')
-const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
+const { validationFailed, apiErrorHandler, writeJSON } = require('./helpers')
 const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 const httpProxy = require('http-proxy')
@@ -50,16 +50,16 @@ function fileProxy (cfg) {
 
       const purchace = getPurchace(purchasedItems, query.purchase_id)
       if (!purchace) {
-        return writeBody(req, res, JSON.stringify({
+        return writeJSON(req, res, {
           error: `purchace_id ${query.purchace_id} not found`
-        }), 404)
+        }, 404)
       }
 
       const file = getFileFrom(purchace, query.file_id)
       if (!file) {
-        return writeBody(req, res, JSON.stringify({
+        return writeJSON(req, res, {
           error: `file_id ${query.file_id} not found`
-        }), 404)
+        }, 404)
       }
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
