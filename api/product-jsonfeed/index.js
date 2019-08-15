@@ -51,9 +51,8 @@ function getFileUrl ({
   name
 }) {
   const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id })
-  const base = `https://${fileProxyHost}`
-  const pathQuery = `/file/${name}?${query}`
-  const u = new url.URL(pathQuery, base)
+  const base = `https://${fileProxyHost}` + `/file/${name}?${query}`
+  const u = new url.URL(base)
   return u.toString()
 }
 
