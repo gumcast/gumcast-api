@@ -5,5 +5,13 @@
   "environment": {},
   "proxy": {
     "command": "node api/bin.js --config ./config.json"
+  },
+  "stages": {
+    "production": {
+      "domain": "api.gumcast.com"
+    },
+    "staging": {
+      "domain": "api-staging.gumcast.com"
+    }
   }
 }
