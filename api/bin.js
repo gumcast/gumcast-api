@@ -76,7 +76,7 @@ assert(cfg.port, 'port is required')
 assert(cfg.rootpath != null, 'rootpath is required')
 assert(cfg.fileProxyHost, 'fileProxyHost is required')
 
-if (cfg.nodeEnv !== 'production') console.log('RUNNING IN DEBUG MODE')
+console.log(cfg.nodeEnv !== 'production' ? 'RUNNING IN DEBUG MODE' : 'RUNNING IN PRODUCTION MODE')
 
 const server = createServer(cfg)
 

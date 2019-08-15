@@ -2,7 +2,9 @@
   "name": "gumcast-api",
   "profile": "gumcast",
   "regions": ["us-east-2"],
-  "environment": {},
+  "environment": {
+    "NODE_ENV": "development"
+  },
   "proxy": {
     "command": "node api/bin.js --config ./config.json"
   },
