@@ -5,15 +5,22 @@ const finalhandler = require('finalhandler')
 const morgan = require('morgan')
 const corsMw = require('cors')
 const { pMiddleware, pHashMiddleware } = require('p-connect')
+const url = require('url')
 
 exports.createServer = function createServer (cfg) {
   const logger = pMiddleware(morgan('dev'))
   const cors = pMiddleware(corsMw({
     origin: (origin, callback) => {
-      if (cfg.corsWhitelist.indexOf(origin) !== -1 || !origin) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
+      if (!origin) return callback(null, true)
+      try {
+        const u = new url.URL(origin)
+        if (cfg.corsWhitelist.indexOf(`${u.protocol}//${u.hostname}`) !== -1) {
+          callback(null, true)
+        } else {
+          callback(null, false)
+        }
+      } catch (e) {
+        callback(e)
       }
     }
   }))
