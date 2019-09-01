@@ -4,28 +4,29 @@ const { createRouter } = require('./router')
 const finalhandler = require('finalhandler')
 const morgan = require('morgan')
 const corsMw = require('cors')
-const { pMiddleware } = require('p-connect')
+const { pMiddleware, pHashMiddleware } = require('p-connect')
 
 exports.createServer = function createServer (cfg) {
   const logger = pMiddleware(morgan('dev'))
-  const whitelist = cfg.corsWhitelist
   const cors = pMiddleware(corsMw({
-    origin: whitelist,
+    origin: cfg.corsWhitelist,
     methods: ['GET', 'POST', 'HEAD']
   }))
-  const router = createRouter(cfg)
+  const router = pHashMiddleware(createRouter(cfg))
+
   const server = http.createServer(handler)
 
   async function handler (req, res) {
     const done = finalhandler(req, res, {
-      onerror: errorHandler,
+      onerror: (err) => { if (err.statusCode !== 404) console.log(err) },
       env: cfg.nodeEnv
     })
 
     try {
       await logger(req, res)
       await cors(req, res)
-      router(req, res, {}, done)
+      await router(req, res, {})
+      done()
     } catch (e) {
       done(e)
     }
@@ -33,10 +34,3 @@ exports.createServer = function createServer (cfg) {
 
   return server
 }
-
-function errorHandler (err) {
-  if (err.statusCode !== 404) console.log(err)
-}
-
-// CORS
-// https://gist.github.com/balupton/3696140
