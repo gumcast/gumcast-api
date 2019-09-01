@@ -10,19 +10,7 @@ const url = require('url')
 exports.createServer = function createServer (cfg) {
   const logger = pMiddleware(morgan('dev'))
   const cors = pMiddleware(corsMw({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true)
-      try {
-        const u = new url.URL(origin)
-        if (cfg.corsWhitelist.indexOf(`${u.protocol}//${u.hostname}`) !== -1) {
-          callback(null, true)
-        } else {
-          callback(null, false)
-        }
-      } catch (e) {
-        callback(e)
-      }
-    }
+    origin: corsFn
   }))
   const router = pHashMiddleware(createRouter(cfg))
 
@@ -41,6 +29,20 @@ exports.createServer = function createServer (cfg) {
       done()
     } catch (e) {
       done(e)
+    }
+  }
+
+  function corsFn (origin, cb) {
+    if (!origin) return cb(null, true)
+    try {
+      const u = new url.URL(origin)
+      if (cfg.corsWhitelist.indexOf(`${u.protocol}//${u.hostname}`) !== -1) {
+        cb(null, true)
+      } else {
+        cb(null, false)
+      }
+    } catch (e) {
+      cb(e)
     }
   }
 
