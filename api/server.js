@@ -5,12 +5,11 @@ const finalhandler = require('finalhandler')
 const morgan = require('morgan')
 const corsMw = require('cors')
 const { pMiddleware, pHashMiddleware } = require('p-connect')
-const url = require('url')
 
 exports.createServer = function createServer (cfg) {
   const logger = pMiddleware(morgan('dev'))
   const cors = pMiddleware(corsMw({
-    origin: corsFn
+    origin: ['https://gumcast.com', /http:\/\/localhost/]
   }))
   const router = pHashMiddleware(createRouter(cfg))
 
@@ -29,20 +28,6 @@ exports.createServer = function createServer (cfg) {
       done()
     } catch (e) {
       done(e)
-    }
-  }
-
-  function corsFn (origin, cb) {
-    if (!origin) return cb(null, true)
-    try {
-      const u = new url.URL(origin)
-      if (cfg.corsWhitelist.indexOf(`${u.protocol}//${u.hostname}`) !== -1) {
-        cb(null, true)
-      } else {
-        cb(null, false)
-      }
-    } catch (e) {
-      cb(e)
     }
   }
 
