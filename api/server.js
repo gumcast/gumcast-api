@@ -9,8 +9,13 @@ const { pMiddleware, pHashMiddleware } = require('p-connect')
 exports.createServer = function createServer (cfg) {
   const logger = pMiddleware(morgan('dev'))
   const cors = pMiddleware(corsMw({
-    origin: cfg.corsWhitelist,
-    methods: ['GET', 'POST', 'HEAD']
+    origin: (origin, callback) => {
+      if (cfg.corsWhitelist.indexOf(origin) !== -1 || !origin) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
   }))
   const router = pHashMiddleware(createRouter(cfg))
 
