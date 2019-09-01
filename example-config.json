@@ -6,5 +6,13 @@
   "mobileApiUrl": null,
   "hostname": "localhost:8080",
   "rootpath": "",
-  "fileProxyHost": null
+  "fileProxyHost": null,
+  "allowedOrigins": [
+    "http://localhost"
+  ],
+  "allowedMethods": [
+    "GET",
+    "POST",
+    "HEAD"
+  ]
 }

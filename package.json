@@ -11,6 +11,7 @@
     "bent": "^1.6.0",
     "body-parser": "^1.19.0",
     "cliclopts": "^1.1.1",
+    "cors": "^2.8.5",
     "finalhandler": "^1.1.2",
     "form-urlencoded": "^4.0.0",
     "http-hash-router": "^2.0.1",
