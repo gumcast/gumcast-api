@@ -7,6 +7,7 @@
   "bugs": {
     "url": "https://github.com/bcomnes/gumcast-api/issues"
   },
+  "engines" : { "node" : "^12.0.0" },
   "dependencies": {
     "bent": "^1.6.0",
     "body-parser": "^1.19.0",
