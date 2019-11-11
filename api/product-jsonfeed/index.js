@@ -109,11 +109,11 @@ async function getJsonfeed (data, opts = {}) {
       avatar: purchace.preview_url
     },
     _itunes: {
-      expired: !purchace.file_data
+      expired: !purchace.subscription_data
       // new_feed_url, TODO: for refresh token?,
     },
-    expired: !purchace.file_data,
-    items: await pMap(purchace.file_data, async (item, i) => {
+    expired: !purchace.subscription_data,
+    items: await pMap(purchace.file_data || [], async (item, i) => {
       const feedItem = {
         id: item.id,
         title: item.name_displayable,
