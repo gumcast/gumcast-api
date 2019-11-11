@@ -7,6 +7,7 @@ const trimLeft = require('trim-left')
 const assert = require('nanoassert')
 const pMap = require('p-map')
 const qs = require('qs')
+const get = require('lodash.get')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 
 exports.getPurchace = getPurchace
@@ -21,11 +22,18 @@ function purchacesWithFileData (data) {
 
 exports.getPurchacePermalink = getPurchacePermalink
 function getPurchacePermalink (purchace) {
-  const downloadURL = purchace['file_data'][0].download_url
+  const downloadURL = get(purchace, 'file_data.0.download_url')
+  if (!downloadURL) return null
   const u = new url.URL(downloadURL)
 
   const permalinkId = u.pathname.split('/')[5]
   return `https://gumroad.com/d/${permalinkId}`
+}
+
+exports.getProductPermalink = getProductPermalink
+function getProductPermalink (purchace) {
+  const uniquePermalink = get(purchace, 'unique_permalink')
+  return `https://gumroad.com/l/${uniquePermalink}`
 }
 
 const gumroadFaviconSvg = 'https://assets.gumroad.com/assets/logo-70cc6d4c5ab29be1bae97811585bc664524cd99897327ec47a67a76a6f69be91.svg'
@@ -85,7 +93,7 @@ async function getJsonfeed (data, opts = {}) {
   assert(rootpath != null)
   const purchace = getPurchace(data, purchase_id)
   if (!purchace) throw new Error('purchace_id not found')
-  const home_page_url = getPurchacePermalink(purchace)
+  const home_page_url = getProductPermalink(purchace) || 'https://gumroad.com'
 
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',

@@ -17,6 +17,7 @@
     "http-hash-router": "^2.0.1",
     "http-proxy": "^1.17.0",
     "jsonfeed-to-rss": "^1.1.1",
+    "lodash.get": "^4.4.2",
     "minimist": "^1.2.0",
     "morgan": "^1.9.1",
     "nanoassert": "^2.0.0",
