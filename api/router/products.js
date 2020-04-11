@@ -11,6 +11,7 @@ function products (cfg) {
   function validate (query) {
     if (!query) return 'Missing querystring'
     if (!query.access_token) return 'Missing access_token'
+    if (!query.refresh_token) return 'Missing refresh_token'
     return null
   }
 
