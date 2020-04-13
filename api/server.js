@@ -9,7 +9,7 @@ const { pMiddleware, pHashMiddleware } = require('p-connect')
 exports.createServer = function createServer (cfg) {
   const logger = pMiddleware(morgan('dev'))
   const cors = pMiddleware(corsMw({
-    origin: ['https://gumcast.com', /http:\/\/localhost/, /\.local$/]
+    origin: ['https://gumcast.com', /http:\/\/localhost/, /\.local(:[0-9])?/]
   }))
   const router = pHashMiddleware(createRouter(cfg))
 
