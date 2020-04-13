@@ -36,7 +36,7 @@ if (argv.version) {
 
 if (argv.help) {
   console.log(`${pkg.name}: ${pkg.description}\n`)
-  console.log(`Usage: gumcast {options}`)
+  console.log('Usage: gumcast {options}')
   opts.print()
   process.exit()
 }
@@ -64,7 +64,7 @@ cfg.mobileApiUrl = process.env.GUMCAST_MOBILE_API_URL || cfg.mobileApiUrl
 cfg.port = process.env.PORT || cfg.port
 cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
 cfg.hostname = process.env.GUMCAST_HOSTNAME || cfg.hostname
-cfg.rootpath = process.env.GUMCAST_ROOTPATH || cfg.rootpath
+cfg.rootpath = process.env.GUMCAST_ROOTPATH || cfg.rootpath || ''
 cfg.fileProxyHost = process.env.GUMCAST_FILE_PROXY_HOST || cfg.fileProxyHost || cfg.hostname + cfg.rootpath
 cfg.corsWhitelist = process.env.GUMCAST_CORS_WHITELIST || cfg.corsWhitelist
 
