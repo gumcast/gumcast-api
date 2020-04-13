@@ -3,7 +3,7 @@ const parseurl = require('parseurl')
 const qs = require('qs')
 const { getJsonfeed } = require('../product-jsonfeed')
 const { getPurchaces } = require('../gumroad-client')
-const { validationFailed, apiErrorHandler, writeBody } = require('./helpers')
+const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
 
 module.exports = cfg => hashRoute(jsonfeed(cfg))
 function jsonfeed (cfg) {
@@ -41,7 +41,13 @@ function jsonfeed (cfg) {
 
       return writeBody(req, res, JSON.stringify(jf, null, ' '))
     } catch (e) {
-      return apiErrorHandler(req, res, e)
+      if (e.message === 'purchace_id not found') {
+        return writeJSON(req, res, {
+          error: `purchace_id ${query.purchase_id} not found`
+        }, 404)
+      } else {
+        return apiErrorHandler(req, res, e)
+      }
     }
   }
 }
