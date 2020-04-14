@@ -19,6 +19,7 @@ function fileProxy (cfg) {
     if (!query.refresh_token) return 'Missing refresh_token'
     if (!query.purchase_id) return 'Missing purchase_id'
     if (!query.file_id) return 'Missing file_id'
+    if (!query.strategey) return 'Missing strategey'
     return null
   }
 
@@ -64,11 +65,21 @@ function fileProxy (cfg) {
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
 
-      return proxy.asyncProxy(req, res, {
-        target: tmpFileUrl,
-        changeOrigin: true,
-        ignorePath: true
-      })
+      if (query.strategey === 'proxy') {
+        return proxy.asyncProxy(req, res, {
+          target: tmpFileUrl,
+          changeOrigin: true,
+          ignorePath: true
+        })
+      } else if (query.strategey === 'redirect') {
+        res.statusCode = 302
+        res.setHeader('Location', tmpFileUrl)
+        return res.end()
+      } else {
+        return writeJSON(req, res, {
+          error: `unknown strategey param ${query.strategey}`
+        }, 400)
+      }
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

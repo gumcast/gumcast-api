@@ -56,9 +56,10 @@ function getFileUrl ({
   refresh_token,
   file_id,
   fileProxyHost,
-  name
+  name,
+  strategey
 }) {
-  const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id })
+  const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id, strategey })
   const base = `https://${fileProxyHost}` + `/file/${encodeURIComponent(name)}?${query}`
   const u = new url.URL(base)
   return u.toString()
@@ -132,19 +133,29 @@ async function getJsonfeed (data, opts = {}) {
         }
       }
 
-      if (proxyFiles === 'true') {
-        feedItem.attachments[0].url = getFileUrl({
+      if (proxyFiles === 'true' || proxyFiles === 'proxy' || proxyFiles === 'redirect') {
+        // proxyFiles === 'true' || 'proxy' proxy all file content with our file route
+        // proxyFiles === 'redirect' proxy with file route, but redirect to short lived URL on request
+        const params = {
           purchase_id,
           access_token,
           refresh_token,
           file_id: item.id,
           fileProxyHost,
-          name: item.name
-        })
+          name: item.name,
+          strategey: null
+        }
+
+        if (['true', 'proxy'].some(i => proxyFiles === i)) params.strategey = 'proxy'
+        if (proxyFiles === 'redirect') params.strategey = 'redirect'
+
+        console.log(params)
+        feedItem.attachments[0].url = getFileUrl(params)
       } else if (proxyFiles === 'redirect-chain') {
+        // resolve the final file URL.  These appear short lived at times.
         feedItem.attachments[0].url = await redirectChain.destination(feedItem.attachments[0].url)
       }
-
+      // No file URL processing
       return feedItem
     }, { concurrency: 10 })
   }
