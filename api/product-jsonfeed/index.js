@@ -149,7 +149,6 @@ async function getJsonfeed (data, opts = {}) {
         if (['true', 'proxy'].some(i => proxyFiles === i)) params.strategey = 'proxy'
         if (proxyFiles === 'redirect') params.strategey = 'redirect'
 
-        console.log(params)
         feedItem.attachments[0].url = getFileUrl(params)
       } else if (proxyFiles === 'redirect-chain') {
         // resolve the final file URL.  These appear short lived at times.
