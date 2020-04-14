@@ -12,12 +12,12 @@ const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 
 exports.getPurchace = getPurchace
 function getPurchace (data, purchaseId) {
-  return data.products.find(p => p['purchase_id'] === purchaseId)
+  return data.products.find(p => p.purchase_id === purchaseId)
 }
 
 exports.purchacesWithFileData = purchacesWithFileData
 function purchacesWithFileData (data) {
-  return data.products.filter(p => p['file_data'].length > 0)
+  return data.products.filter(p => p.file_data.length > 0)
 }
 
 exports.getPurchacePermalink = getPurchacePermalink
@@ -101,7 +101,7 @@ async function getJsonfeed (data, opts = {}) {
     home_page_url,
     feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }),
     description: trimRight(trimLeft(striptags(purchace.description))),
-    user_comment: `Feed generated and delivered by gumcast.com`,
+    user_comment: 'Feed generated and delivered by gumcast.com',
     icon: purchace.preview_url || gumroadFaviconSvg,
     favicon: gumroadFaviconSvg,
     author: {
@@ -132,7 +132,7 @@ async function getJsonfeed (data, opts = {}) {
         }
       }
 
-      if (proxyFiles) {
+      if (proxyFiles === 'true') {
         feedItem.attachments[0].url = getFileUrl({
           purchase_id,
           access_token,
@@ -141,7 +141,7 @@ async function getJsonfeed (data, opts = {}) {
           fileProxyHost,
           name: item.name
         })
-      } else {
+      } else if (proxyFiles === 'redirect-chain') {
         feedItem.attachments[0].url = await redirectChain.destination(feedItem.attachments[0].url)
       }
 
