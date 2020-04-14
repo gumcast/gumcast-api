@@ -1,9 +1,17 @@
-# gumcast
+# gumcast-api
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/bcomnes/gumcast-api.svg)](https://greenkeeper.io/)
+API for generating Apple Podcast compatable RSS feeds from Gumroad products.
 
-API for generating Apple Podcast compatable RSS feeds.
+## Develop
 
+To run locally, run the following:
 
-## Config
+```console
+git clone https://github.com/gumcast/gumcast-api.git
+cd gumcast-api
+npm install
+# create a config.json with the appropriate secrets and keys
+npm run dev
+```
+
 
