@@ -133,9 +133,14 @@ async function getJsonfeed (data, opts = {}) {
         }
       }
 
-      if (proxyFiles === 'true' || proxyFiles === 'proxy' || proxyFiles === 'redirect') {
-        // proxyFiles === 'true' || 'proxy' proxy all file content with our file route
-        // proxyFiles === 'redirect' proxy with file route, but redirect to short lived URL on request
+      if (proxyFiles === 'redirect-chain') {
+        // resolve the final file URL.  These appear short lived at times.
+        feedItem.attachments[0].url = await redirectChain.destination(feedItem.attachments[0].url)
+        return feedItem
+      } else if (proxyFiles === 'raw') {
+        // No file URL processing
+        return feedItem
+      } else {
         const params = {
           purchase_id,
           access_token,
@@ -146,16 +151,12 @@ async function getJsonfeed (data, opts = {}) {
           strategey: null
         }
 
-        if (['true', 'proxy'].some(i => proxyFiles === i)) params.strategey = 'proxy'
-        if (proxyFiles === 'redirect') params.strategey = 'redirect'
-
+        if (['proxy'].some(i => proxyFiles === i)) params.strategey = 'proxy'
+        else if (['true', 'redirect'].some(i => proxyFiles === i)) params.strategey = 'redirect'
+        else params.strategey = 'redirect'
         feedItem.attachments[0].url = getFileUrl(params)
-      } else if (proxyFiles === 'redirect-chain') {
-        // resolve the final file URL.  These appear short lived at times.
-        feedItem.attachments[0].url = await redirectChain.destination(feedItem.attachments[0].url)
+        return feedItem
       }
-      // No file URL processing
-      return feedItem
     }, { concurrency: 10 })
   }
 
