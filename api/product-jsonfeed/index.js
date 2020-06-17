@@ -7,6 +7,7 @@ const trimLeft = require('trim-left')
 const assert = require('nanoassert')
 const pMap = require('p-map')
 const qs = require('qs')
+const cleanDeep = require('clean-deep')
 const get = require('lodash.get')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 
@@ -110,11 +111,11 @@ async function getJsonfeed (data, opts = {}) {
       name: purchace.creator_name,
       avatar: purchace.preview_url
     },
-    _itunes: {
+    _itunes: cleanDeep({
       // expired: !purchace.subscription_data TODO: No longer available
       new_feed_url: incomingHost !== hostname ? getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }) : null
       // new_feed_url, TODO: for refresh token?,
-    },
+    }),
     // expired: !purchace.subscription_data,
     items: await pMap(purchace.file_data || [], async (item, i) => {
       const feedItem = {
