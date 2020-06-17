@@ -16,7 +16,6 @@ exports.createServer = function createServer (cfg) {
   const server = http.createServer(handler)
 
   async function handler (req, res) {
-    console.log(req.headers)
     const done = finalhandler(req, res, {
       onerror: (err) => { if (err.statusCode !== 404) console.log(err) },
       env: cfg.nodeEnv
@@ -25,7 +24,11 @@ exports.createServer = function createServer (cfg) {
     try {
       await logger(req, res)
       await cors(req, res)
-      await router(req, res, {})
+      if (['production'].indexOf(process.env.NODE_ENV) >= 0 && req.headers['x-forwarded-proto'] !== 'https') {
+        res.redirect(302, 'https://' + req.hostname + req.originalUrl)
+      } else {
+        await router(req, res, {})
+      }
       done()
     } catch (e) {
       done(e)
