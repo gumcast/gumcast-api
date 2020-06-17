@@ -25,7 +25,7 @@ exports.createServer = function createServer (cfg) {
       await logger(req, res)
       await cors(req, res)
       if (['production'].indexOf(process.env.NODE_ENV) >= 0 && req.headers['x-forwarded-proto'] !== 'https') {
-        res.writeHead(302, {
+        res.writeHead(301, {
           Location: 'https://' + req.headers.host + req.url
         })
         res.end()
