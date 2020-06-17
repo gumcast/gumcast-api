@@ -20,7 +20,7 @@ exports.createServer = function createServer (cfg) {
       onerror: (err) => { if (err.statusCode !== 404) console.log(err) },
       env: cfg.nodeEnv
     })
-    console.log(req.headers)
+
     try {
       await logger(req, res)
       await cors(req, res)
