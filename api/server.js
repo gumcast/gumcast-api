@@ -16,6 +16,7 @@ exports.createServer = function createServer (cfg) {
   const server = http.createServer(handler)
 
   async function handler (req, res) {
+    console.log(req.headers)
     const done = finalhandler(req, res, {
       onerror: (err) => { if (err.statusCode !== 404) console.log(err) },
       env: cfg.nodeEnv
