@@ -38,7 +38,8 @@ function rssFeed (cfg) {
         proxyFiles: query.proxyFiles,
         hostname: cfg.hostname,
         rootpath: cfg.rootpath,
-        fileProxyHost: cfg.fileProxyHost
+        fileProxyHost: cfg.fileProxyHost,
+        incomingHost: req.headers.host
       })
       return writeBody(req, res, rss, 200, 'application/rss+xml')
     } catch (e) {
