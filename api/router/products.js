@@ -1,12 +1,12 @@
 /* eslint-disable camelcase */
-const { hashRoute } = require('p-connect')
+const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
 const { getPurchaces } = require('../gumroad-client.js')
 
 const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
 
-module.exports = cfg => hashRoute(products(cfg))
+module.exports = cfg => route(products(cfg))
 function products (cfg) {
   function validate (query) {
     if (!query) return 'Missing querystring'
@@ -15,7 +15,7 @@ function products (cfg) {
     return null
   }
 
-  return async (req, res, opts) => {
+  return async (req, res, opts, next) => {
     const url = parseurl(req)
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)

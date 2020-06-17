@@ -1,4 +1,4 @@
-const { hashRoute } = require('p-connect')
+const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
 const { getPurchaces } = require('../gumroad-client')
@@ -8,7 +8,7 @@ const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 const httpProxy = require('http-proxy')
 const promisify = require('util.promisify')
 
-exports.fileProxy = cfg => hashRoute(fileProxy(cfg))
+exports.fileProxy = cfg => route(fileProxy(cfg))
 function fileProxy (cfg) {
   const proxy = httpProxy.createProxyServer()
   proxy.asyncProxy = promisify(proxy.web)
@@ -29,7 +29,7 @@ function fileProxy (cfg) {
     return null
   }
 
-  return async (req, res, { params }) => {
+  return async (req, res, { params }, next) => {
     const url = parseurl(req)
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)

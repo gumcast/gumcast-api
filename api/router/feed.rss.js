@@ -1,11 +1,11 @@
-const { hashRoute } = require('p-connect')
+const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
 const { getRssFeed } = require('../product-jsonfeed')
 const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
 
-module.exports = cfg => hashRoute(rssFeed(cfg))
+module.exports = cfg => route(rssFeed(cfg))
 function rssFeed (cfg) {
   function validate (query) {
     if (!query) return 'Missing querystring'

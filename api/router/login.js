@@ -1,12 +1,12 @@
 const bodyParser = require('body-parser')
-const { pMiddleware, hashRoute } = require('p-connect')
+const { pMiddleware, route } = require('p-connect')
 
 const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
 const { getAccessTokenFromPassword } = require('../gumroad-client.js')
 
 const json = pMiddleware(bodyParser.json())
 
-module.exports = cfg => hashRoute(login(cfg))
+module.exports = cfg => route(login(cfg))
 function login (cfg) {
   function validate (body) {
     if (!body) return 'Missing body'
@@ -15,7 +15,7 @@ function login (cfg) {
     return null
   }
 
-  return async (req, res, opts) => {
+  return async (req, res, opts, next) => {
     await json(req, res)
 
     const invalidMsg = validate(req.body)
