@@ -20,14 +20,13 @@ exports.createServer = function createServer (cfg) {
       onerror: (err) => { if (err.statusCode !== 404) console.log(err) },
       env: cfg.nodeEnv
     })
-
+    console.log(req.headers)
     try {
       await logger(req, res)
       await cors(req, res)
       if (['production'].indexOf(process.env.NODE_ENV) >= 0 && req.headers['x-forwarded-proto'] !== 'https') {
-        console.log(req)
         res.writeHead(302, {
-          Location: 'https://' + req.hostname + req.originalUrl
+          Location: 'https://' + req.headers.host + req.url
         })
         res.end()
       } else {
