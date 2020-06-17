@@ -85,7 +85,8 @@ async function getJsonfeed (data, opts = {}) {
     hostname,
     rootpath,
     proxyFiles,
-    fileProxyHost
+    fileProxyHost,
+    incomingHost
   } = opts
   assert(purchase_id)
   assert(access_token)
@@ -111,6 +112,7 @@ async function getJsonfeed (data, opts = {}) {
     },
     _itunes: {
       // expired: !purchace.subscription_data TODO: No longer available
+      new_feed_url: incomingHost !== hostname ? getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }) : null
       // new_feed_url, TODO: for refresh token?,
     },
     // expired: !purchace.subscription_data,
@@ -168,5 +170,7 @@ async function getJsonfeed (data, opts = {}) {
 exports.getRssFeed = getRssFeed
 async function getRssFeed (data, opts = {}) {
   const jf = await getJsonfeed(data, opts)
-  return jsonfeedToRSS(jf)
+  return jsonfeedToRSS(jf, {
+    feedURLFn: (feedURL, jf) => feedURL.replace(/\.json\b/, '.rss')
+  })
 }

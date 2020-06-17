@@ -36,7 +36,8 @@ function jsonfeed (cfg) {
         proxyFiles: query.proxyFiles,
         hostname: cfg.hostname,
         rootpath: cfg.rootpath,
-        fileProxyHost: cfg.fileProxyHost
+        fileProxyHost: cfg.fileProxyHost,
+        incoming_host: req.headers.host
       })
 
       return writeBody(req, res, JSON.stringify(jf, null, ' '))
