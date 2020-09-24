@@ -1,4 +1,4 @@
-name: Version and Release
+name: npm version
 
 on:
   workflow_dispatch:
