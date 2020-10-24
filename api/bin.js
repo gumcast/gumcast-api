@@ -1,4 +1,13 @@
 #!/usr/bin/env node
+
+if (
+  process.env.NODE_ENV === 'production' &&
+  process.env.DD_SITE &&
+  process.env.DD_API_KEY) {
+  const tracer = require('dd-trace').init()
+  exports.tracer = tracer
+}
+
 const minimist = require('minimist')
 const cliOpts = require('cliclopts')
 const pkg = require('../package.json')
