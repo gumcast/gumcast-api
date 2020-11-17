@@ -35,6 +35,8 @@ function rssFeed (cfg) {
         purchase_id: query.purchase_id,
         access_token: query.access_token,
         refresh_token: query.access_token,
+        mobile_token: cfg.mobile_token,
+        mobileApiUrl: cfg.mobileApiUrl,
         proxyFiles: query.proxyFiles,
         hostname: cfg.hostname,
         rootpath: cfg.rootpath,
