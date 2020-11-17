@@ -10,6 +10,7 @@ const qs = require('qs')
 const cleanDeep = require('clean-deep')
 const get = require('lodash.get')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
+const { getPurchaceData } = require('../gumroad-client')
 
 exports.getPurchace = getPurchace
 function getPurchace (data, purchaseId) {
@@ -83,6 +84,8 @@ async function getJsonfeed (data, opts = {}) {
     purchase_id,
     access_token,
     refresh_token,
+    mobile_token,
+    mobileApiUrl,
     hostname,
     rootpath,
     proxyFiles,
@@ -92,11 +95,21 @@ async function getJsonfeed (data, opts = {}) {
   assert(purchase_id)
   assert(access_token)
   assert(refresh_token)
+  assert(mobile_token)
+  assert(mobileApiUrl)
   assert(hostname)
   assert(rootpath != null)
   const purchace = getPurchace(data, purchase_id)
   if (!purchace) throw new Error('purchace_id not found')
   const home_page_url = getProductPermalink(purchace) || 'https://gumroad.com'
+
+  const purchaceData = await getPurchaceData({
+    access_token,
+    refresh_token,
+    mobile_token,
+    mobileApiUrl,
+    url_redirect_external_id: purchace.url_redirect_external_id
+  })
 
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',
@@ -117,7 +130,7 @@ async function getJsonfeed (data, opts = {}) {
       // new_feed_url, TODO: for refresh token?,
     }),
     // expired: !purchace.subscription_data,
-    items: await pMap(purchace.file_data || [], async (item, i) => {
+    items: await pMap(purchaceData.product.file_data || [], async (item, i) => {
       const feedItem = {
         id: item.id,
         title: item.name_displayable,

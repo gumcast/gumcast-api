@@ -4,6 +4,32 @@ const bent = require('bent')
 const formurlencoded = require('form-urlencoded').default
 const assert = require('nanoassert')
 
+exports.getPurchaceData = getPurchaceData
+async function getPurchaceData ({
+  access_token,
+  refresh_token,
+  mobile_token,
+  url_redirect_external_id,
+  mobileApiUrl
+}) {
+  assert(access_token, 'access_token required')
+  assert(refresh_token, 'refresh_token required')
+  assert(mobile_token, 'mobile_token required')
+  assert(url_redirect_external_id, 'url_redirect_external_id required')
+  assert(mobileApiUrl, 'mobileApiUrl required')
+
+  const get = bent(mobileApiUrl, 'GET', 'json', 200, {
+    accept: 'application/json',
+    Authorization: 'Bearer ' + access_token
+  })
+
+  const params = {
+    mobile_token: mobile_token
+  }
+
+  return get(`/url_redirects/get_url_redirect_attributes/${url_redirect_external_id}.json/?${qs.stringify(params)}`)
+}
+
 exports.getPurchaces = getPurchaces
 async function getPurchaces ({
   access_token,
