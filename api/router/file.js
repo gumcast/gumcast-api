@@ -1,7 +1,7 @@
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
-const { getPurchaces } = require('../gumroad-client')
+const { getPurchaces, getPurchaceData } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeJSON } = require('./helpers')
 const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
@@ -56,7 +56,21 @@ function fileProxy (cfg) {
         }, 404)
       }
 
-      const file = getFileFrom(purchace, query.file_id)
+      const purchaceData = await getPurchaceData({
+        access_token: query.access_token,
+        refresh_token: query.refresh_token,
+        mobile_token: cfg.mobile_token,
+        mobileApiUrl: cfg.mobileApiUrl,
+        url_redirect_external_id: purchace.url_redirect_external_id
+      })
+
+      if (!purchaceData || !purchaceData.product) {
+        return writeJSON(req, res, {
+          error: `url redirect purchase data not found ${purchace.url_redirect_external_id}`
+        }, 404)
+      }
+
+      const file = getFileFrom(purchaceData.product, query.file_id)
       if (!file) {
         return writeJSON(req, res, {
           error: `file_id ${query.file_id} not found`
