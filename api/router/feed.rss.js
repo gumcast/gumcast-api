@@ -4,6 +4,25 @@ const qs = require('qs')
 const { getRssFeed } = require('../product-jsonfeed')
 const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
+const LRU = require('lru-cache')
+
+const cache = new LRU({
+  max: 500,
+  maxAge: 1000 * 60 * 5, // 5 mins
+  updateAgeOnGet: false
+})
+
+/* eslint-disable camelcase */
+function getCacheKey ({
+  access_token,
+  refresh_token,
+  purchase_id,
+  proxyFiles,
+  incomingHost
+}) {
+  return [access_token, refresh_token, purchase_id, proxyFiles, incomingHost].join(';')
+}
+/* eslint-enable camelcase */
 
 module.exports = cfg => route(rssFeed(cfg))
 function rssFeed (cfg) {
@@ -21,6 +40,20 @@ function rssFeed (cfg) {
     const invalidMsg = validate(query)
     if (invalidMsg) {
       return validationFailed(req, res, invalidMsg)
+    }
+
+    const cacheKey = getCacheKey({
+      access_token: query.access_token,
+      refresh_token: query.refresh_token,
+      purchase_id: query.purchase_id,
+      proxyFiles: query.proxyFiles,
+      incomingHost: req.headers.host
+    })
+
+    const cachedRss = cache.get(cacheKey)
+
+    if (cachedRss) {
+      return writeBody(req, res, cachedRss, 200, 'application/rss+xml')
     }
 
     try {
@@ -43,6 +76,7 @@ function rssFeed (cfg) {
         fileProxyHost: cfg.fileProxyHost,
         incomingHost: req.headers.host
       })
+      cache.set(cacheKey, rss)
       return writeBody(req, res, rss, 200, 'application/rss+xml')
     } catch (e) {
       if (e.message === 'purchace_id not found') {

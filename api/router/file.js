@@ -7,6 +7,24 @@ const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 const httpProxy = require('http-proxy')
 const promisify = require('util.promisify')
+const LRU = require('lru-cache')
+
+const cache = new LRU({
+  max: 500,
+  maxAge: 1000 * 60 * 20, // 20 mins,
+  updateAgeOnGet: false
+})
+
+/* eslint-disable camelcase */
+function getCacheKey ({
+  access_token,
+  refresh_token,
+  purchase_id,
+  file_id
+}) {
+  return [access_token, refresh_token, purchase_id, file_id].join(';')
+}
+/* eslint-enable camelcase */
 
 exports.fileProxy = cfg => route(fileProxy(cfg))
 function fileProxy (cfg) {
@@ -39,6 +57,19 @@ function fileProxy (cfg) {
     const invalidParamMsg = paramValidate(params)
     if (invalidParamMsg) {
       return validationFailed(req, res, invalidParamMsg)
+    }
+
+    const cacheKey = getCacheKey({
+      access_token: query.access_token,
+      refresh_token: query.refresh_token,
+      purchase_id: query.purchase_id,
+      file_id: query.file_id
+    })
+
+    const cachedUrl = cache.get(cacheKey)
+
+    if (cachedUrl) {
+      return strategeyResponse(query.strategey, cachedUrl)
     }
 
     try {
@@ -78,24 +109,28 @@ function fileProxy (cfg) {
       }
 
       const tmpFileUrl = await redirectChain.destination(file.download_url)
+      cache.set(cacheKey, tmpFileUrl)
+      return strategeyResponse(query.strategey, tmpFileUrl)
+    } catch (e) {
+      return apiErrorHandler(req, res, e)
+    }
 
-      if (query.strategey === 'proxy') {
+    function strategeyResponse (strategey, tmpFileUrl) {
+      if (strategey === 'proxy') {
         return proxy.asyncProxy(req, res, {
           target: tmpFileUrl,
           changeOrigin: true,
           ignorePath: true
         })
-      } else if (query.strategey === 'redirect') {
+      } else if (strategey === 'redirect') {
         res.statusCode = 302
         res.setHeader('Location', tmpFileUrl)
         return res.end()
       } else {
         return writeJSON(req, res, {
-          error: `unknown strategey param ${query.strategey}`
+          error: `unknown strategey param ${strategey}`
         }, 400)
       }
-    } catch (e) {
-      return apiErrorHandler(req, res, e)
     }
   }
 }

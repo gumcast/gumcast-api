@@ -4,6 +4,25 @@ const qs = require('qs')
 const { getJsonfeed } = require('../product-jsonfeed')
 const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
+const LRU = require('lru-cache')
+
+const cache = new LRU({
+  max: 500,
+  maxAge: 1000 * 60 * 5, // 5 mins
+  updateAgeOnGet: false
+})
+
+/* eslint-disable camelcase */
+function getCacheKey ({
+  access_token,
+  refresh_token,
+  purchase_id,
+  proxyFiles,
+  incomingHost
+}) {
+  return [access_token, refresh_token, purchase_id, proxyFiles, incomingHost].join(';')
+}
+/* eslint-enable camelcase */
 
 module.exports = cfg => route(jsonfeed(cfg))
 function jsonfeed (cfg) {
@@ -20,6 +39,20 @@ function jsonfeed (cfg) {
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
     if (invalidMsg) return validationFailed(req, res, invalidMsg)
+
+    const cacheKey = getCacheKey({
+      access_token: query.access_token,
+      refresh_token: query.refresh_token,
+      purchase_id: query.purchase_id,
+      proxyFiles: query.proxyFiles,
+      incomingHost: req.headers.host
+    })
+
+    const cachedJSON = cache.get(cacheKey)
+
+    if (cachedJSON) {
+      return writeBody(req, res, cachedJSON)
+    }
 
     try {
       const purchasedItems = await getPurchaces({
@@ -42,7 +75,9 @@ function jsonfeed (cfg) {
         incomingHost: req.headers.host
       })
 
-      return writeBody(req, res, JSON.stringify(jf, null, ' '))
+      const jsonString = JSON.stringify(jf, null, ' ')
+      cache.set(cacheKey, jsonString)
+      return writeBody(req, res, jsonString)
     } catch (e) {
       if (e.message === 'purchace_id not found') {
         return writeJSON(req, res, {
