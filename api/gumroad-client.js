@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 const qs = require('qs')
 const bent = require('bent')
-const formurlencoded = require('form-urlencoded').default
+const querystring = require('querystring')
 const assert = require('nanoassert')
 
 exports.getPurchaceData = getPurchaceData
@@ -75,7 +75,7 @@ async function getAccessTokenFromPassword ({
     'Content-Type': 'multipart/form-data'
   })
 
-  const formData = formurlencoded({
+  const formData = querystring.stringify({
     client_id: client_id,
     username: username,
     password: password,
