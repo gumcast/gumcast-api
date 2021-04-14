@@ -52,7 +52,7 @@ function products (cfg) {
         latestPurchaseList.add(sortedPurchaseArray[0].purchase_id)
       }
 
-      filteredProductData.products = filteredProductData.products.filter(p => latestPurchaseList.has(p.purchase_id))
+      filteredProductData.products = filteredProductData.products.filter(p => latestPurchaseList.has(p.purchase_id)).filter((item) => !item.is_archived)
 
       return writeBody(req, res, JSON.stringify(filteredProductData))
     } catch (e) {
