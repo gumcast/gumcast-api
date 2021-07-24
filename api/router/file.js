@@ -114,6 +114,7 @@ function fileProxy (cfg) {
           mobile_token: cfg.mobile_token,
           mobileApiUrl: cfg.mobileApiUrl
         })
+        cache.set(purchacesCacheKey, purchasedItems)
       }
 
       const purchace = getPurchace(purchasedItems, query.purchase_id)
@@ -142,6 +143,7 @@ function fileProxy (cfg) {
           mobileApiUrl: cfg.mobileApiUrl,
           url_redirect_external_id: purchace.url_redirect_external_id
         })
+        cache.set(purchaceDataCacheKey, purchaceData)
       }
 
       if (!purchaceData || !purchaceData.product) {

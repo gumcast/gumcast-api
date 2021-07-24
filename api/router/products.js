@@ -58,6 +58,7 @@ function products (cfg) {
           mobile_token: cfg.mobile_token,
           mobileApiUrl: cfg.mobileApiUrl
         })
+        cache.set(purchacesCacheKey, purchasedItems)
       }
 
       const filteredProductData = { ...purchasedItems }
