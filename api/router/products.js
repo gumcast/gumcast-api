@@ -6,6 +6,23 @@ const { getPurchaces } = require('../gumroad-client.js')
 const get = require('lodash.get')
 
 const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
+const { cache } = require('../cache.js')
+
+/* eslint-disable camelcase */
+function getPurchacesCacheKey ({
+  access_token,
+  refresh_token,
+  mobile_token,
+  mobileApiUrl
+}) {
+  return [
+    access_token,
+    refresh_token,
+    mobile_token,
+    mobileApiUrl
+  ].join(';')
+}
+/* eslint-enable camelcase */
 
 module.exports = cfg => route(products(cfg))
 function products (cfg) {
@@ -24,12 +41,24 @@ function products (cfg) {
     if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
-      const purchasedItems = await getPurchaces({
+      const purchacesCacheKey = getPurchacesCacheKey({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl
       })
+
+      let purchasedItems
+
+      if (cache.get(purchacesCacheKey)) purchasedItems = cache.get(purchacesCacheKey)
+      else {
+        purchasedItems = await getPurchaces({
+          access_token: query.access_token,
+          refresh_token: query.refresh_token,
+          mobile_token: cfg.mobile_token,
+          mobileApiUrl: cfg.mobileApiUrl
+        })
+      }
 
       const filteredProductData = { ...purchasedItems }
       filteredProductData.products = filteredProductData.products.filter(p => Array.isArray(p.file_data))

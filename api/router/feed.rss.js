@@ -4,13 +4,7 @@ const qs = require('qs')
 const { getRssFeed } = require('../product-jsonfeed')
 const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
-const LRU = require('lru-cache')
-
-const cache = new LRU({
-  max: 500,
-  maxAge: 1000 * 60 * 5, // 5 mins
-  updateAgeOnGet: false
-})
+const { cache } = require('../cache')
 
 /* eslint-disable camelcase */
 function getCacheKey ({

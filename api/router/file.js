@@ -7,13 +7,7 @@ const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
 const httpProxy = require('http-proxy')
 const promisify = require('util.promisify')
-const LRU = require('lru-cache')
-
-const cache = new LRU({
-  max: 500,
-  maxAge: 1000 * 60 * 20, // 20 mins,
-  updateAgeOnGet: false
-})
+const { cache } = require('../cache.js')
 
 /* eslint-disable camelcase */
 function getCacheKey ({
@@ -23,6 +17,36 @@ function getCacheKey ({
   file_id
 }) {
   return [access_token, refresh_token, purchase_id, file_id].join(';')
+}
+
+function getPurchacesCacheKey ({
+  access_token,
+  refresh_token,
+  mobile_token,
+  mobileApiUrl
+}) {
+  return [
+    access_token,
+    refresh_token,
+    mobile_token,
+    mobileApiUrl
+  ].join(';')
+}
+
+function getPurchaceDataCacheKey ({
+  access_token,
+  refresh_token,
+  mobile_token,
+  mobileApiUrl,
+  url_redirect_external_id
+}) {
+  return [
+    access_token,
+    refresh_token,
+    mobile_token,
+    mobileApiUrl,
+    url_redirect_external_id
+  ].join(';')
 }
 /* eslint-enable camelcase */
 
@@ -73,12 +97,24 @@ function fileProxy (cfg) {
     }
 
     try {
-      const purchasedItems = await getPurchaces({
+      const purchacesCacheKey = getPurchacesCacheKey({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl
       })
+
+      let purchasedItems
+
+      if (cache.get(purchacesCacheKey)) purchasedItems = cache.get(purchacesCacheKey)
+      else {
+        purchasedItems = await getPurchaces({
+          access_token: query.access_token,
+          refresh_token: query.refresh_token,
+          mobile_token: cfg.mobile_token,
+          mobileApiUrl: cfg.mobileApiUrl
+        })
+      }
 
       const purchace = getPurchace(purchasedItems, query.purchase_id)
       if (!purchace) {
@@ -87,13 +123,26 @@ function fileProxy (cfg) {
         }, 404)
       }
 
-      const purchaceData = await getPurchaceData({
+      const purchaceDataCacheKey = getPurchaceDataCacheKey({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl,
         url_redirect_external_id: purchace.url_redirect_external_id
       })
+
+      let purchaceData
+
+      if (cache.get(purchaceDataCacheKey)) purchaceData = cache.get(purchaceDataCacheKey)
+      else {
+        purchaceData = await getPurchaceData({
+          access_token: query.access_token,
+          refresh_token: query.refresh_token,
+          mobile_token: cfg.mobile_token,
+          mobileApiUrl: cfg.mobileApiUrl,
+          url_redirect_external_id: purchace.url_redirect_external_id
+        })
+      }
 
       if (!purchaceData || !purchaceData.product) {
         return writeJSON(req, res, {
