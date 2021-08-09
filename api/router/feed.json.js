@@ -14,7 +14,7 @@ function getCacheKey ({
   proxyFiles,
   incomingHost
 }) {
-  return [access_token, refresh_token, purchase_id, proxyFiles, incomingHost].join(';')
+  return ['json', access_token, refresh_token, purchase_id, proxyFiles, incomingHost].join(';')
 }
 /* eslint-enable camelcase */
 
