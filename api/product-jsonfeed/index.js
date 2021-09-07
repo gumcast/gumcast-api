@@ -2,8 +2,6 @@
 const url = require('url')
 const jsonfeedToRSS = require('jsonfeed-to-rss')
 const striptags = require('striptags')
-const trimRight = require('trim-right')
-const trimLeft = require('trim-left')
 const assert = require('nanoassert')
 const pMap = require('p-map')
 const qs = require('qs')
@@ -116,7 +114,7 @@ async function getJsonfeed (data, opts = {}) {
     title: purchace.name,
     home_page_url,
     feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }),
-    description: trimRight(trimLeft(striptags(purchace.description))),
+    description: striptags(purchace.description).trim(),
     user_comment: 'Feed generated and delivered by gumcast.com',
     icon: purchace.preview_url || gumroadFaviconSvg,
     favicon: gumroadFaviconSvg,
