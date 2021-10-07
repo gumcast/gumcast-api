@@ -7,7 +7,7 @@ const corsMw = require('cors')
 const { pMiddleware } = require('p-connect')
 
 exports.createServer = function createServer (cfg) {
-  const logger = pMiddleware(morgan('dev'))
+  const logger = pMiddleware(morgan(cfg.nodeEnv === 'production' ? 'combined' : 'dev'))
   const cors = pMiddleware(corsMw({
     origin: ['https://gumcast.com', /http:\/\/localhost/, /\.local(:[0-9])?/]
   }))
