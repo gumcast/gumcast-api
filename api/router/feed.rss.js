@@ -68,7 +68,8 @@ function rssFeed (cfg) {
         hostname: cfg.hostname,
         rootpath: cfg.rootpath,
         fileProxyHost: cfg.fileProxyHost,
-        incomingHost: req.headers.host
+        incomingHost: req.headers.host,
+        alternateProductLookup: cfg.alternateProductLookup
       })
       cache.set(cacheKey, rss)
       return writeBody(req, res, rss, 200, 'application/rss+xml')

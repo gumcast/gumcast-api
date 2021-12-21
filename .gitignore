@@ -64,3 +64,4 @@ config.json
 
 private.json
 package-lock.json
+old-config.json

@@ -14,5 +14,6 @@
     "GET",
     "POST",
     "HEAD"
-  ]
+  ],
+  "alternateProductLookup": false
 }

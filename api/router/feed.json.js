@@ -66,7 +66,8 @@ function jsonfeed (cfg) {
         hostname: cfg.hostname,
         rootpath: cfg.rootpath,
         fileProxyHost: cfg.fileProxyHost,
-        incomingHost: req.headers.host
+        incomingHost: req.headers.host,
+        alternateProductLookup: cfg.alternateProductLookup
       })
 
       const jsonString = JSON.stringify(jf, null, ' ')

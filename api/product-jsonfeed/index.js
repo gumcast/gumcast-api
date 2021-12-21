@@ -88,7 +88,8 @@ async function getJsonfeed (data, opts = {}) {
     rootpath,
     proxyFiles,
     fileProxyHost,
-    incomingHost
+    incomingHost,
+    alternateProductLookup
   } = opts
   assert(purchase_id)
   assert(access_token)
@@ -101,13 +102,19 @@ async function getJsonfeed (data, opts = {}) {
   if (!purchace) throw new Error('purchace_id not found')
   const home_page_url = getProductPermalink(purchace) || 'https://gumroad.com'
 
-  const purchaceData = await getPurchaceData({
-    access_token,
-    refresh_token,
-    mobile_token,
-    mobileApiUrl,
-    url_redirect_external_id: purchace.url_redirect_external_id
-  })
+  let fileData = purchace.file_data
+
+  if (alternateProductLookup) {
+    const purchaceData = await getPurchaceData({
+      access_token,
+      refresh_token,
+      mobile_token,
+      mobileApiUrl,
+      url_redirect_external_id: purchace.url_redirect_external_id
+    })
+
+    fileData = purchaceData.product.file_data
+  }
 
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',
@@ -128,7 +135,7 @@ async function getJsonfeed (data, opts = {}) {
       // new_feed_url, TODO: for refresh token?,
     }),
     // expired: !purchace.subscription_data,
-    items: await pMap(purchaceData.product.file_data || [], async (item, i) => {
+    items: await pMap(fileData || [], async (item, i) => {
       const feedItem = {
         id: item.id,
         title: item.name_displayable,
@@ -171,7 +178,7 @@ async function getJsonfeed (data, opts = {}) {
         feedItem.attachments[0].url = getFileUrl(params)
         return feedItem
       }
-    }, { concurrency: 10 })
+    }, { concurrency: 2 })
   }
 
   jsonfeed.items = jsonfeed.items.reverse()

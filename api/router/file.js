@@ -132,27 +132,30 @@ function fileProxy (cfg) {
         url_redirect_external_id: purchace.url_redirect_external_id
       })
 
-      let purchaceData
+      let productData = purchace
 
-      if (cache.get(purchaceDataCacheKey)) purchaceData = cache.get(purchaceDataCacheKey)
-      else {
-        purchaceData = await getPurchaceData({
-          access_token: query.access_token,
-          refresh_token: query.refresh_token,
-          mobile_token: cfg.mobile_token,
-          mobileApiUrl: cfg.mobileApiUrl,
-          url_redirect_external_id: purchace.url_redirect_external_id
-        })
-        cache.set(purchaceDataCacheKey, purchaceData)
+      if (cfg.alternateProductLookup) {
+        if (cache.get(purchaceDataCacheKey)) productData = cache.get(purchaceDataCacheKey)
+        else {
+          const purchaceData = await getPurchaceData({
+            access_token: query.access_token,
+            refresh_token: query.refresh_token,
+            mobile_token: cfg.mobile_token,
+            mobileApiUrl: cfg.mobileApiUrl,
+            url_redirect_external_id: purchace.url_redirect_external_id
+          })
+          cache.set(purchaceDataCacheKey, purchaceData.product)
+          productData = purchaceData.product
+        }
       }
 
-      if (!purchaceData || !purchaceData.product) {
+      if (!productData) {
         return writeJSON(req, res, {
           error: `url redirect purchase data not found ${purchace.url_redirect_external_id}`
         }, 404)
       }
 
-      const file = getFileFrom(purchaceData.product, query.file_id)
+      const file = getFileFrom(productData, query.file_id)
       if (!file) {
         return writeJSON(req, res, {
           error: `file_id ${query.file_id} not found`
