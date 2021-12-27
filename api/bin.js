@@ -90,6 +90,13 @@ assert(cfg.corsWhitelist, 'corsWhitelist is required')
 
 console.log(cfg.nodeEnv !== 'production' ? 'RUNNING IN DEBUG MODE' : 'RUNNING IN PRODUCTION MODE')
 
+if (cfg.nodeEnv === 'production') {
+  const tracer = require('dd-trace').init({
+    logInjection: true
+  })
+  cfg.tracer = tracer
+}
+
 const server = createServer(cfg)
 
 server.once('listening', () => {
