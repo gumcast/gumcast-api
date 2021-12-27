@@ -2,12 +2,44 @@ const http = require('http')
 const { createRouter } = require('./router')
 
 const finalhandler = require('finalhandler')
-const morgan = require('morgan')
+const pino = require('pino-http')
 const corsMw = require('cors')
 const { pMiddleware } = require('p-connect')
 
+const obscure = ['access_token', 'refresh_token']
+
+function obscureQs (url, obsureFields) {
+  for (const field of obsureFields) {
+    const original = url?.searchParams.get(field)
+    let obscured = `${original.substring(0, 5)}`
+    for (const _ of original.substring(5, original.length - 1)) { // eslint-disable-line no-unused-vars
+      obscured += 'x'
+    }
+    url?.searchParams.set(field, obscured)
+  }
+}
+
 exports.createServer = function createServer (cfg) {
-  const logger = pMiddleware(morgan(cfg.nodeEnv === 'production' ? 'combined' : 'dev'))
+  const logger = pMiddleware(pino({
+    redact: {
+      paths: ['req.url'],
+      censor: (value, path) => {
+        try {
+          const url = new URL(`https://example.com${value}`)
+          obscureQs(url, obscure)
+          return `${url.pathname}${url.search}`
+        } catch (e) { return value }
+      }
+    },
+    transport: cfg.nodeEnv === 'production'
+      ? undefined
+      : {
+          target: 'pino-pretty',
+          options: {
+            colorize: true
+          }
+        }
+  }))
   const cors = pMiddleware(corsMw({
     origin: ['https://gumcast.com', /http:\/\/localhost/, /\.local(:[0-9])?/]
   }))
