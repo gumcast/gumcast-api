@@ -4,7 +4,9 @@ if (
   process.env.NODE_ENV === 'production' &&
   process.env.DD_SITE &&
   process.env.DD_API_KEY) {
-  const tracer = require('dd-trace').init()
+  const tracer = require('dd-trace').init({
+    logInjection: true
+  })
   exports.tracer = tracer
 }
 
@@ -89,13 +91,6 @@ assert(cfg.fileProxyHost, 'fileProxyHost is required')
 assert(cfg.corsWhitelist, 'corsWhitelist is required')
 
 console.log(cfg.nodeEnv !== 'production' ? 'RUNNING IN DEBUG MODE' : 'RUNNING IN PRODUCTION MODE')
-
-if (cfg.nodeEnv === 'production') {
-  const tracer = require('dd-trace').init({
-    logInjection: true
-  })
-  cfg.tracer = tracer
-}
 
 const server = createServer(cfg)
 
