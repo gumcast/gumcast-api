@@ -65,7 +65,7 @@
     "start": "./api/bin.js",
     "test": "run-s test:*",
     "test:api": "tape api/**/*.test.js",
-    "test:deps": "dependency-check package.json api/bin --verbose --no-dev",
+    "test:deps": "dependency-check package.json api/bin --verbose --no-dev -i pino-pretty",
     "release": "git push --follow-tags && gh-release -y",
     "version": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:' && git add CHANGELOG.md"
   }
