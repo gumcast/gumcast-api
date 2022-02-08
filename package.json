@@ -10,7 +10,8 @@
     "url": "https://github.com/bcomnes/gumcast-api/issues"
   },
   "engines": {
-    "node": "^16.0.0"
+    "node": "^v17.4.0",
+    "npm": "^8.3.1"
   },
   "dependencies": {
     "bent": "^7.0.7",
