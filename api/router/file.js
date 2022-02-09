@@ -178,11 +178,7 @@ function fileProxy (cfg) {
         })
       } else if (strategey === 'redirect') {
         res.statusCode = 302
-        try {
-          res.setHeader('Location', tmpFileUrl)
-        } catch (err) {
-          throw new Error(`Error setting location header: ${tmpFileUrl}`, { cause: err })
-        }
+        res.setHeader('Location', tmpFileUrl)
         return res.end()
       } else {
         return writeJSON(req, res, {
