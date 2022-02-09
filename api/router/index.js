@@ -5,8 +5,9 @@ const products = require('./products')
 const jsonFeed = require('./feed.json.js')
 const rss = require('./feed.rss.js')
 const { fileProxy } = require('./file')
-const { writeJSON } = require('./helpers.js')
+const { writeJSON } = require('./helpers')
 const pkg = require('../../package.json')
+const { cache } = require('../cache')
 
 exports.createRouter = function createRouter (cfg) {
   const router = HttpHashRouter()
@@ -16,6 +17,12 @@ exports.createRouter = function createRouter (cfg) {
       name: pkg.name,
       version: pkg.version,
       hello: 'world'
+    })
+  })
+  router.set('/cache', (req, res, opts) => {
+    writeJSON(req, res, {
+      cacheSize: cache.size,
+      cacheMax: cache.max
     })
   })
   router.set('/login', { POST: login(cfg) })
