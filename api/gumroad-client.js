@@ -24,7 +24,7 @@ async function getPurchaceData ({
   })
 
   const params = {
-    mobile_token: mobile_token
+    mobile_token
   }
 
   return get(`/url_redirects/get_url_redirect_attributes/${url_redirect_external_id}.json/?${qs.stringify(params)}`)
@@ -50,10 +50,10 @@ async function getPurchaces ({
   const params = {
     include_mobile_unfriendly_products: true,
     include_subscriptions: true,
-    mobile_token: mobile_token
+    mobile_token
   }
 
-  return get(`/purchases/index.json?${qs.stringify(params)}`)
+  return get(`purchases/index.json?${qs.stringify(params)}`)
 }
 
 exports.getAccessTokenFromPassword = getAccessTokenFromPassword
@@ -76,10 +76,10 @@ async function getAccessTokenFromPassword ({
   })
 
   const formData = querystring.stringify({
-    client_id: client_id,
-    username: username,
-    password: password,
-    client_secret: client_secret,
+    client_id,
+    username,
+    password,
+    client_secret,
     grant_type: 'password',
     scope: 'mobile_api'
   })

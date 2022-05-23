@@ -6,7 +6,7 @@ test('purchacesWithFileData', t => {
   const productsWithFiles = purchacesWithFileData(data)
 
   for (const product of productsWithFiles) {
-    t.true(product['file_data'].length > 0, `${product.name} has file_data`)
+    t.true(product.file_data.length > 0, `${product.name} has file_data`)
   }
   t.end()
 })
@@ -27,7 +27,7 @@ test('Get permalink', t => {
 test.skip('Generate jsonfeed', async t => {
   const jf = await getJsonfeed(data, {
     purchase_id: '7vvS02eBjHXfPeUhKxjq8A==',
-    feed_url: `https://gumcast.com/feed.json?authToken=1234&refreshToken=1234&productId=1234`
+    feed_url: 'https://gumcast.com/feed.json?authToken=1234&refreshToken=1234&productId=1234'
   })
 
   console.dir(jf, {
@@ -40,7 +40,7 @@ test.skip('Generate jsonfeed', async t => {
 test.skip('Generate rss feed', async t => {
   const rss = await getRssFeed(data, {
     purchase_id: '7vvS02eBjHXfPeUhKxjq8A==',
-    feed_url: `https://gumcast.com/feed.rss?authToken=1234&refreshToken=1234&productId=1234`
+    feed_url: 'https://gumcast.com/feed.rss?authToken=1234&refreshToken=1234&productId=1234'
   })
 
   console.log(rss)
