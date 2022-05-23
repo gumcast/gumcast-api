@@ -7,7 +7,10 @@ const pMap = require('p-map')
 const qs = require('qs')
 const cleanDeep = require('clean-deep')
 const get = require('lodash.get')
-const redirectChain = require('redirect-chain')({ maxRedirects: 5 })
+const redirectChain = require('redirect-chain')({
+  maxRedirects: 5,
+  method: 'GET'
+})
 const { getPurchaceData } = require('../gumroad-client')
 
 exports.getPurchace = getPurchace
