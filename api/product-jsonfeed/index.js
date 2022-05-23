@@ -8,8 +8,7 @@ const qs = require('qs')
 const cleanDeep = require('clean-deep')
 const get = require('lodash.get')
 const redirectChain = require('redirect-chain')({
-  maxRedirects: 5,
-  method: 'GET'
+  maxRedirects: 5
 })
 const { getPurchaceData } = require('../gumroad-client')
 

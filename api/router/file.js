@@ -5,8 +5,7 @@ const { getPurchaces, getPurchaceData } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeJSON } = require('./helpers')
 const { getFileFrom, getPurchace } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({
-  maxRedirects: 5,
-  method: 'GET'
+  maxRedirects: 5
 })
 const httpProxy = require('http-proxy')
 const promisify = require('util.promisify')
