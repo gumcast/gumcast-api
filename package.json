@@ -23,7 +23,7 @@
     "finalhandler": "^1.1.2",
     "http-hash-router": "^2.0.1",
     "http-proxy": "^1.17.0",
-    "jsonfeed-to-rss": "^3.0.3",
+    "jsonfeed-to-rss": "^3.0.6",
     "lodash.get": "^4.4.2",
     "lru-cache": "^7.3.1",
     "minimist": "^1.2.0",
