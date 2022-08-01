@@ -1,7 +1,7 @@
 {
   "name": "gumcast-api",
   "description": "A service for generating rss feeds from gumroad subscriptions",
-  "version": "1.2.13",
+  "version": "1.2.14",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io/)",
   "bin": {
     "gumcast-api": "api/bin.js"
