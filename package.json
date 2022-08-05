@@ -19,7 +19,7 @@
     "clean-deep": "^3.3.0",
     "cliclopts": "^1.1.1",
     "cors": "^2.8.5",
-    "dd-trace": "2.12.1",
+    "dd-trace": "2.12.2",
     "finalhandler": "^1.1.2",
     "http-hash-router": "^2.0.1",
     "http-proxy": "^1.17.0",
