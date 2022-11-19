@@ -90,7 +90,7 @@ async function getJsonfeed (data, opts = {}) {
     rootpath,
     proxyFiles,
     fileProxyHost,
-    incomingHost,
+    // incomingHost,
     alternateProductLookup
   } = opts
   assert(purchase_id)
@@ -137,8 +137,8 @@ async function getJsonfeed (data, opts = {}) {
     },
     _itunes: cleanDeep({
       // expired: !purchace.subscription_data TODO: No longer available
-      new_feed_url: incomingHost !== hostname ? getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }) : null
-      // new_feed_url, TODO: for refresh token?,
+      // TODO: disable this after Nov 28
+      new_feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath })
     }),
     // expired: !purchace.subscription_data,
     items: await pMap(fileData || [], async (item, i) => {
