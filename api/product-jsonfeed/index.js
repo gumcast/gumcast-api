@@ -118,6 +118,10 @@ async function getJsonfeed (data, opts = {}) {
     fileData = purchaceData.product.file_data
   }
 
+  fileData.sort((item1, item2) => {
+    return (new Date(item1.created_at)) - (new Date(item2.created_at))
+  })
+
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',
     title: purchace.name,
