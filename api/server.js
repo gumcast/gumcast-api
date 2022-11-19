@@ -34,27 +34,17 @@ exports.createServer = function createServer (cfg) {
     },
     transport: cfg.nodeEnv === 'production'
       ? {
-          targets: [
-            {
-              target: path.join(__dirname, 'pino-datadog-logger.js'),
-              options: {
-                ddClientConf: {
-                  authMethods: {
-                    apiKeyAuth: process.env.DD_API_KEY
-                  }
-                },
-                service: 'gumcast-api-fly'
-              },
-              level: 'error' // minimum log level that should be sent to datadog
-            },
-            {
-              target: 'pino-pretty',
-              options: {
-                colorize: true,
-                singleLine: true
+          target: path.join(__dirname, 'pino-datadog-logger.js'),
+          options: {
+            ddClientConf: {
+              authMethods: {
+                apiKeyAuth: process.env.DD_API_KEY
               }
-            }
-          ]
+            },
+            service: 'gumcast-api',
+            ddsource: 'fly'
+          },
+          level: 'error' // minimum log level that should be sent to datadog
         }
       : {
           target: 'pino-pretty',
