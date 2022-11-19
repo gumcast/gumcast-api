@@ -32,7 +32,17 @@ exports.createServer = function createServer (cfg) {
       }
     },
     transport: cfg.nodeEnv === 'production'
-      ? undefined
+      ? {
+          target: 'pino-datadog-transport',
+          options: {
+            ddClientConf: {
+              authMethods: {
+                apiKeyAuth: process.env.DD_API_KEY
+              }
+            }
+          },
+          level: 'error' // minimum log level that should be sent to datadog
+        }
       : {
           target: 'pino-pretty',
           options: {
