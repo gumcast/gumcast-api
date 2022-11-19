@@ -1,27 +1,28 @@
-name: npm version
+name: flyctl deploy
 
 on:
   workflow_dispatch:
     inputs:
-      newversion:
-        description: 'npm version {major,minor,patch}'
+      ref:
+        description: 'ref to deploy'
         required: true
+        default: 'master'
 
 env:
-  node_version: 14
+  node_version: 19
+  FORCE_COLOR: 1
 
 concurrency: # prevent concurrent releases
-  group: npm-bump
+  group: flyctl-deploy
   cancel-in-progress: true
 
 jobs:
-  version_and_release:
+  flyctl_deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
-        # fetch full history so things like auto-changelog work properly
-        fetch-depth: 0
+        ref: ${{ github.event.inputs.ref }}
     - name: Use Node.js ${{ env.node_version }}
       uses: actions/setup-node@v3
       with:
@@ -31,14 +32,6 @@ jobs:
     - run: npm i
     - run: npm test
     - run: git reset --hard && git clean -fd
-    - name: npm version && npm publish
-      uses: bcomnes/npm-bump@v2.1.0
-      with:
-        git_email: bcomnes@gmail.com
-        git_username: ${{ github.actor }}
-        newversion: ${{ github.event.inputs.newversion }}
-        github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
-        publish_cmd: npm run release
     - uses: superfly/flyctl-actions/setup-flyctl@master
     - run: flyctl deploy --remote-only
       env:
@@ -48,3 +41,4 @@ jobs:
       with:
         name: pacakge-lock.json
         path: package-lock.json
+
