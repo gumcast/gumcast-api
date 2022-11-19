@@ -6,8 +6,8 @@ LABEL maintainer="HifiWifi LLC"
 # Set the working directory
 WORKDIR /usr/src/app
 
-RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-RUN apk add --no-cache pypy@testing
+# RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+# RUN apk add --no-cache pypy@testing
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
