@@ -1,4 +1,5 @@
 const http = require('http')
+const path = require('path')
 const { createRouter } = require('./router')
 
 const finalhandler = require('finalhandler')
@@ -33,15 +34,27 @@ exports.createServer = function createServer (cfg) {
     },
     transport: cfg.nodeEnv === 'production'
       ? {
-          target: 'pino-datadog-transport',
-          options: {
-            ddClientConf: {
-              authMethods: {
-                apiKeyAuth: process.env.DD_API_KEY
+          targets: [
+            {
+              target: path.join(__dirname, 'pino-datadog-logger.js'),
+              options: {
+                ddClientConf: {
+                  authMethods: {
+                    apiKeyAuth: process.env.DD_API_KEY
+                  }
+                },
+                service: 'gumcast-api-fly'
+              },
+              level: 'error' // minimum log level that should be sent to datadog
+            },
+            {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                singleLine: true
               }
             }
-          },
-          level: 'error' // minimum log level that should be sent to datadog
+          ]
         }
       : {
           target: 'pino-pretty',
