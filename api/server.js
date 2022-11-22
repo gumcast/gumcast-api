@@ -32,6 +32,14 @@ exports.createServer = function createServer (cfg) {
         } catch (e) { return value }
       }
     },
+    customLogLevel: function (req, res, err) {
+      if (res.statusCode >= 400 && res.statusCode < 500) {
+        return 'warn'
+      } else if (res.statusCode >= 500 || err) {
+        return 'error'
+      }
+      return 'info'
+    },
     transport: cfg.nodeEnv === 'production'
       ? {
           targets: [
