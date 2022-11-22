@@ -52,8 +52,8 @@ exports.createServer = function createServer (cfg) {
                   }
                 },
                 service: 'gumcast-api',
-                ddsource: 'fly',
-                ddtags: 'env:prod,host:fly'
+                ddsource: 'nodejs',
+                ddtags: 'env:prod,hosting:fly'
               }
             },
             {
