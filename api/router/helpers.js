@@ -32,7 +32,7 @@ function writeBody (req, res, body, statusCode = 200, contentType = 'application
   assert(statusCode)
   assert(contentType)
 
-  res.setHeader('content-type', contentType)
+  res.setHeader('content-type', `${contentType};charset=UTF-8`)
   res.statusCode = statusCode
   res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
   return res.end(req.method === 'HEAD' ? null : body)

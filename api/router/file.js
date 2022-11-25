@@ -1,9 +1,10 @@
+/* eslint-disable no-control-regex */
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
 const { getPurchaces, getPurchaceData } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeJSON } = require('./helpers')
-const { getFileFrom, getPurchace } = require('../product-jsonfeed')
+const { getFileFrom, getPurchace, getProductPermalink } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({
   maxRedirects: 5
 })
@@ -92,10 +93,23 @@ function fileProxy (cfg) {
       file_id: query.file_id
     })
 
-    const cachedUrl = cache.get(cacheKey)
+    const cachedItem = cache.get(cacheKey)
 
-    if (cachedUrl) {
-      return strategeyResponse(query.strategey, cachedUrl)
+    if (cachedItem) {
+      const {
+        cachedURL,
+        feedAuthor,
+        feedTitle,
+        feedHomePage,
+        fileID,
+        userID
+      } = cachedItem
+      if (userID) res.setHeader('X-Gumcast-User-Id', userID)
+      if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
+      if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
+      if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+      if (fileID) res.setHeader('X-Gumcast-File-ID', fileID)
+      return strategeyResponse(query.strategey, cachedURL)
     }
 
     try {
@@ -119,12 +133,23 @@ function fileProxy (cfg) {
         cache.set(purchacesCacheKey, purchasedItems)
       }
 
+      const userID = purchasedItems?.user_id
+      if (userID) res.setHeader('X-Gumcast-User-Id', userID)
+
       const purchace = getPurchace(purchasedItems, query.purchase_id)
       if (!purchace) {
         return writeJSON(req, res, {
           error: `purchace_id ${query.purchace_id} not found`
         }, 404)
       }
+
+      const feedAuthor = purchace?.creator_username?.replace(/[^\x00-\x7F]/g, '')
+      const feedTitle = purchace?.name?.replace(/[^\x00-\x7F]/g, '')
+      const feedHomePage = getProductPermalink(purchace)
+
+      if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
+      if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
+      if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
 
       const purchaceDataCacheKey = getPurchaceDataCacheKey({
         access_token: query.access_token,
@@ -164,8 +189,17 @@ function fileProxy (cfg) {
         }, 404)
       }
 
+      const fileID = file.id
+      if (fileID) res.setHeader('X-Gumcast-File-ID', fileID)
       const tmpFileUrl = await redirectChain.destination(file.download_url)
-      cache.set(cacheKey, tmpFileUrl)
+      cache.set(cacheKey, {
+        cachedURL: tmpFileUrl,
+        feedAuthor,
+        feedTitle,
+        feedHomePage,
+        fileID,
+        userID
+      })
       return strategeyResponse(query.strategey, tmpFileUrl)
     } catch (e) {
       return apiErrorHandler(req, res, e)

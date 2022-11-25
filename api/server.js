@@ -1,6 +1,7 @@
 const http = require('http')
 const path = require('path')
 const { createRouter } = require('./router')
+const { randomUUID } = require('crypto')
 
 const finalhandler = require('finalhandler')
 const pino = require('pino-http')
@@ -31,6 +32,14 @@ exports.createServer = function createServer (cfg) {
           return `${url.pathname}${url.search}`
         } catch (e) { return value }
       }
+    },
+    genReqId: function (req, res) {
+      if (req.id) return req.id
+      let id = req?.headers?.['X-Request-Id']
+      if (id) return id
+      id = randomUUID()
+      res.setHeader('X-Request-Id', id)
+      return id
     },
     customLogLevel: function (req, res, err) {
       if (res.statusCode >= 400 && res.statusCode < 500) {

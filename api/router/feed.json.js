@@ -1,7 +1,8 @@
+/* eslint-disable no-control-regex */
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
-const { getJsonfeed } = require('../product-jsonfeed')
+const { getJsonfeed, getPurchace } = require('../product-jsonfeed')
 const { getPurchaces } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
 const { cache } = require('../cache')
@@ -42,10 +43,21 @@ function jsonfeed (cfg) {
       incomingHost: req.headers.host
     })
 
-    const cachedJSON = cache.get(cacheKey)
+    const cachedItem = cache.get(cacheKey)
 
-    if (cachedJSON) {
-      return writeBody(req, res, cachedJSON)
+    if (cachedItem) {
+      const {
+        jsonString,
+        feedAuthor,
+        feedTitle,
+        feedHomePage,
+        userID
+      } = cachedItem
+      if (userID) res.setHeader('X-Gumcast-User-Id', userID)
+      if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
+      if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
+      if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+      return writeBody(req, res, jsonString)
     }
 
     try {
@@ -55,6 +67,10 @@ function jsonfeed (cfg) {
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl
       })
+
+      const userID = purchasedItems?.user_id
+
+      if (userID) res.setHeader('X-Gumcast-User-Id', userID)
 
       const jf = await getJsonfeed(purchasedItems, {
         purchase_id: query.purchase_id,
@@ -70,8 +86,24 @@ function jsonfeed (cfg) {
         alternateProductLookup: cfg.alternateProductLookup
       })
 
+      const purchace = getPurchace(purchasedItems, query.purchase_id)
+
+      const feedAuthor = purchace?.creator_username?.replace(/[^\x00-\x7F]/g, '')
+      const feedTitle = purchace?.name?.replace(/[^\x00-\x7F]/g, '')
+      const feedHomePage = jf?.home_page_url
+
+      if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
+      if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
+      if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+
       const jsonString = JSON.stringify(jf, null, ' ')
-      cache.set(cacheKey, jsonString)
+      cache.set(cacheKey, {
+        jsonString,
+        feedAuthor,
+        feedTitle,
+        feedHomePage,
+        userID
+      })
       return writeBody(req, res, jsonString)
     } catch (e) {
       if (e.message === 'purchace_id not found') {

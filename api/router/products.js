@@ -61,6 +61,8 @@ function products (cfg) {
         cache.set(purchacesCacheKey, purchasedItems)
       }
 
+      if (purchasedItems?.user_id) res.setHeader('X-Gumcast-User-Id', purchasedItems?.user_id)
+
       const filteredProductData = { ...purchasedItems }
       filteredProductData.products = filteredProductData.products.filter(p => Array.isArray(p.file_data))
 
