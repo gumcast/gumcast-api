@@ -53,12 +53,14 @@ function rssFeed (cfg) {
         feedAuthor,
         feedTitle,
         feedHomePage,
+        disabledToken,
         userID
       } = cachedItem
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
       if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
       if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
       if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+      if (disabledToken) res.setHeader('X-Gumcast-Disabled-Token', disabledToken)
       return writeBody(req, res, rss, 200, 'application/rss+xml')
     }
 
@@ -74,7 +76,10 @@ function rssFeed (cfg) {
 
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
 
+      const disabledToken = cfg.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
+
       const { rss, jf } = await getRssFeed(purchasedItems, {
+        disabledToken,
         purchase_id: query.purchase_id,
         access_token: query.access_token,
         refresh_token: query.access_token,
@@ -82,6 +87,7 @@ function rssFeed (cfg) {
         mobileApiUrl: cfg.mobileApiUrl,
         proxyFiles: query.proxyFiles,
         hostname: cfg.hostname,
+        transport: cfg.transport,
         rootpath: cfg.rootpath,
         fileProxyHost: cfg.fileProxyHost,
         incomingHost: req.headers.host,
@@ -97,12 +103,14 @@ function rssFeed (cfg) {
       if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
       if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
       if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+      if (disabledToken) res.setHeader('X-Gumcast-Disabled-Token', true)
 
       cache.set(cacheKey, {
         rss,
         feedAuthor,
         feedTitle,
         feedHomePage,
+        disabledToken,
         userID
       })
       return writeBody(req, res, rss, 200, 'application/rss+xml')

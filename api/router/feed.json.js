@@ -51,12 +51,14 @@ function jsonfeed (cfg) {
         feedAuthor,
         feedTitle,
         feedHomePage,
+        disabledToken,
         userID
       } = cachedItem
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
       if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
       if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
       if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+      if (disabledToken) res.setHeader('X-Gumcast-Disabled-Token', disabledToken)
       return writeBody(req, res, jsonString)
     }
 
@@ -72,13 +74,17 @@ function jsonfeed (cfg) {
 
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
 
+      const disabledToken = cfg.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
+
       const jf = await getJsonfeed(purchasedItems, {
+        disabledToken,
         purchase_id: query.purchase_id,
         access_token: query.access_token,
         refresh_token: query.access_token,
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl,
         proxyFiles: query.proxyFiles,
+        transport: cfg.transport,
         hostname: cfg.hostname,
         rootpath: cfg.rootpath,
         fileProxyHost: cfg.fileProxyHost,
@@ -95,6 +101,7 @@ function jsonfeed (cfg) {
       if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
       if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
       if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
+      if (disabledToken) res.setHeader('X-Gumcast-Disabled-Token', true)
 
       const jsonString = JSON.stringify(jf, null, ' ')
       cache.set(cacheKey, {
@@ -102,6 +109,7 @@ function jsonfeed (cfg) {
         feedAuthor,
         feedTitle,
         feedHomePage,
+        disabledToken,
         userID
       })
       return writeBody(req, res, jsonString)

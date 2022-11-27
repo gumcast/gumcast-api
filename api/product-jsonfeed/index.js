@@ -58,11 +58,12 @@ function getFileUrl ({
   refresh_token,
   file_id,
   fileProxyHost,
+  transport,
   name,
   strategey
 }) {
   const query = qs.stringify({ purchase_id, access_token, refresh_token, file_id, strategey })
-  const base = `https://${fileProxyHost}` + `/file/${encodeURIComponent(name)}?${query}`
+  const base = `${transport}://${fileProxyHost}` + `/file/${encodeURIComponent(name)}?${query}`
   const u = new url.URL(base)
   return u.toString()
 }
@@ -78,15 +79,22 @@ function getJsonFeedUrl ({
   return `https://${hostname}${rootpath}/feed.json?${query}`
 }
 
+const disabledCopy = ['This feed has been disabled because too many people were subscribed to it.',
+  'If this is your subscription, please log into gumcast.com and re-create a new feed URL to continue subscribing.',
+  'Ensure that you don\'t add it to a globally available podcast directory or share it with anyone else.',
+  'If you are not the subscription owner, please create your own personal subscription and create your own gumcast.com podcast feed.'].join(' ')
+
 exports.getJsonfeed = getJsonfeed
 async function getJsonfeed (data, opts = {}) {
   const {
+    disabledToken,
     purchase_id,
     access_token,
     refresh_token,
     mobile_token,
     mobileApiUrl,
     hostname,
+    transport,
     rootpath,
     proxyFiles,
     fileProxyHost,
@@ -126,10 +134,12 @@ async function getJsonfeed (data, opts = {}) {
 
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',
-    title: purchace.name,
+    title: disabledToken ? `[FEED DISABLED. TOO MANY SUBSCRIBERS. PLEASE MAKE A NEW FEED AT GUMCAST.COM] ${purchace.name}` : purchace.name,
     home_page_url,
     feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }),
-    description: striptags(purchace.description).trim(),
+    description: disabledToken
+      ? disabledCopy
+      : striptags(purchace.description).trim(),
     user_comment: 'Feed generated and delivered by gumcast.com',
     icon: purchace.preview_url || gumroadFaviconSvg,
     favicon: gumroadFaviconSvg,
@@ -147,7 +157,7 @@ async function getJsonfeed (data, opts = {}) {
       const feedItem = {
         id: item.id,
         title: item.name_displayable,
-        content_text: item.name_displayable,
+        content_text: disabledToken ? disabledCopy : item.name_displayable,
         image: purchace.preview_url,
         banner_image: purchace.preview_url,
         date_published: item.created_at,
@@ -177,7 +187,8 @@ async function getJsonfeed (data, opts = {}) {
           file_id: item.id,
           fileProxyHost,
           name: item.name,
-          strategey: null
+          strategey: null,
+          transport
         }
 
         if (['proxy'].some(i => proxyFiles === i)) params.strategey = 'proxy'

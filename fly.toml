@@ -11,11 +11,14 @@ processes = []
 [build.args]
   ENV = 'production'
   NODE_ENV = 'production'
-  HOST = 'breadcrum.net'
+  HOSTNAME = 'gumcast.com'
   TRANSPORT='https'
 
 [env]
+  ENV = 'production'
   NODE_ENV = 'production'
+  HOSTNAME = 'gumcast.com'
+  TRANSPORT='https'
 
 [experimental]
   allowed_public_ports = []

@@ -86,6 +86,19 @@ function fileProxy (cfg) {
       return validationFailed(req, res, invalidParamMsg)
     }
 
+    const disabledToken = cfg.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
+
+    if (disabledToken) {
+      res.setHeader('content-type', 'application/json')
+      res.statusCode(403)
+      const errBody = JSON.stringify({
+        error: 'This token has been disabled because it has too many subscribers. Please log into GumCast.com and re-generate a new podcast feed. Ensure that you do not share it publiclly or add it to public podcast directories. '
+      })
+      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+      res.setHeader('X-Gumcast-Disabled-Token', true)
+      return res.end(errBody)
+    }
+
     const cacheKey = getCacheKey({
       access_token: query.access_token,
       refresh_token: query.refresh_token,

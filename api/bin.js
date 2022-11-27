@@ -76,16 +76,18 @@ cfg.mobileApiUrl = process.env.GUMCAST_MOBILE_API_URL ?? cfg.mobileApiUrl
 cfg.port = process.env.PORT ?? cfg.port
 cfg.nodeEnv = process.env.NODE_ENV ?? cfg.nodeEnv
 cfg.hostname = process.env.GUMCAST_HOSTNAME ?? cfg.hostname
+cfg.transport = process.env.GUMCAST_TRANSPORT ?? cfg.transport
 cfg.rootpath = process.env.GUMCAST_ROOTPATH ?? cfg.rootpath ?? ''
 cfg.fileProxyHost = process.env.GUMCAST_FILE_PROXY_HOST ?? cfg.fileProxyHost ?? cfg.hostname + cfg.rootpath
 cfg.corsWhitelist = process.env.GUMCAST_CORS_WHITELIST ?? cfg.corsWhitelist
 cfg.alternateProductLookup = process.env.GUMCAST_ALTERNATE_PRODUCT_LOOKUP ?? cfg.alternateProductLookup
-cfg.disabledTokens = JSON.parse(process.env.GUMCAST_DISABLED_TOKENS ?? cfg.disabledTokens ?? '[]')
+cfg.disabledTokens = process.env.GUMCAST_DISABLED_TOKENS ? JSON.parse(process.env.GUMCAST_DISABLED_TOKENS) : cfg.disabledTokens ?? []
 cfg.ddAPIKey = process.env.DD_API_KEY ?? cfg.ddAPIKey
 
 const logger = getLogger(cfg)
 
 try {
+  assert(cfg.transport, 'transport required')
   assert(cfg.client_id, 'client_id is required')
   assert(cfg.client_secret, 'client_secret is required')
   assert(cfg.mobile_token, 'mobile_token is required')
