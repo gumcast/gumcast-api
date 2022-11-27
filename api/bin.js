@@ -17,6 +17,7 @@ const fs = require('fs')
 const path = require('path')
 const assert = require('assert')
 const { createServer } = require('./server')
+const getLogger = require('./pino-logger')
 
 const allowedOptions = [
   {
@@ -67,39 +68,50 @@ if (argv.config) {
   Object.assign(cfg, JSON.parse(configFile))
 }
 
-cfg.client_id = process.env.GUMCAST_CLIENT_ID || cfg.client_id
-cfg.client_secret = process.env.GUMCAST_CLIENT_SECRET || cfg.client_secret
-cfg.mobile_token = process.env.GUMCAST_MOBILE_TOKEN || cfg.mobile_token
-cfg.oAuthUrl = process.env.GUMCAST_OAUTH_URL || cfg.oAuthUrl
-cfg.mobileApiUrl = process.env.GUMCAST_MOBILE_API_URL || cfg.mobileApiUrl
-cfg.port = process.env.PORT || cfg.port
-cfg.nodeEnv = process.env.NODE_ENV || cfg.nodeEnv
-cfg.hostname = process.env.GUMCAST_HOSTNAME || cfg.hostname
-cfg.rootpath = process.env.GUMCAST_ROOTPATH || cfg.rootpath || ''
-cfg.fileProxyHost = process.env.GUMCAST_FILE_PROXY_HOST || cfg.fileProxyHost || cfg.hostname + cfg.rootpath
-cfg.corsWhitelist = process.env.GUMCAST_CORS_WHITELIST || cfg.corsWhitelist
-cfg.alternateProductLookup = process.env.GUMCAST_ALTERNATE_PRODUCT_LOOKUP || cfg.alternateProductLookup
+cfg.client_id = process.env.GUMCAST_CLIENT_ID ?? cfg.client_id
+cfg.client_secret = process.env.GUMCAST_CLIENT_SECRET ?? cfg.client_secret
+cfg.mobile_token = process.env.GUMCAST_MOBILE_TOKEN ?? cfg.mobile_token
+cfg.oAuthUrl = process.env.GUMCAST_OAUTH_URL ?? cfg.oAuthUrl
+cfg.mobileApiUrl = process.env.GUMCAST_MOBILE_API_URL ?? cfg.mobileApiUrl
+cfg.port = process.env.PORT ?? cfg.port
+cfg.nodeEnv = process.env.NODE_ENV ?? cfg.nodeEnv
+cfg.hostname = process.env.GUMCAST_HOSTNAME ?? cfg.hostname
+cfg.rootpath = process.env.GUMCAST_ROOTPATH ?? cfg.rootpath ?? ''
+cfg.fileProxyHost = process.env.GUMCAST_FILE_PROXY_HOST ?? cfg.fileProxyHost ?? cfg.hostname + cfg.rootpath
+cfg.corsWhitelist = process.env.GUMCAST_CORS_WHITELIST ?? cfg.corsWhitelist
+cfg.alternateProductLookup = process.env.GUMCAST_ALTERNATE_PRODUCT_LOOKUP ?? cfg.alternateProductLookup
+cfg.disabledTokens = JSON.parse(process.env.GUMCAST_DISABLED_TOKENS ?? cfg.disabledTokens ?? '[]')
+cfg.ddAPIKey = process.env.DD_API_KEY ?? cfg.ddAPIKey
 
-assert(cfg.client_id, 'client_id is required')
-assert(cfg.client_secret, 'client_secret is required')
-assert(cfg.mobile_token, 'mobile_token is required')
-assert(cfg.oAuthUrl, 'oAuthUrl is required')
-assert(cfg.mobileApiUrl, 'mobileApiUrl is required')
-assert(cfg.port, 'port is required')
-assert(cfg.rootpath != null, 'rootpath is required')
-assert(cfg.fileProxyHost, 'fileProxyHost is required')
-assert(cfg.corsWhitelist, 'corsWhitelist is required')
+const logger = getLogger(cfg)
 
-console.log(cfg.nodeEnv !== 'production' ? 'RUNNING IN DEBUG MODE' : 'RUNNING IN PRODUCTION MODE')
+try {
+  assert(cfg.client_id, 'client_id is required')
+  assert(cfg.client_secret, 'client_secret is required')
+  assert(cfg.mobile_token, 'mobile_token is required')
+  assert(cfg.oAuthUrl, 'oAuthUrl is required')
+  assert(cfg.mobileApiUrl, 'mobileApiUrl is required')
+  assert(cfg.port, 'port is required')
+  assert(cfg.rootpath != null, 'rootpath is required')
+  assert(cfg.fileProxyHost, 'fileProxyHost is required')
+  assert(cfg.corsWhitelist, 'corsWhitelist is required')
+  assert(cfg.disabledTokens, 'disabledTokens array is required')
+  if (cfg.nodeEnv === 'production') assert(cfg.ddAPIKey, 'ddAPIKey required in production')
+} catch (err) {
+  logger.fatal(err, 'Configuration error')
+  throw err
+}
 
-const server = createServer(cfg)
+logger.info(cfg.nodeEnv !== 'production' ? 'RUNNING IN DEBUG MODE' : 'RUNNING IN PRODUCTION MODE')
+
+const server = createServer(cfg, logger)
 
 server.once('listening', () => {
-  console.log(`listening on http://localhost:${server.address().port}`)
+  logger.info(`listening on http://localhost:${server.address().port}`)
 })
 
 server.on('error', err => {
-  if (err.statusCode !== 404) console.log(err)
+  if (err.statusCode !== 404) logger.error(err, 'Server error')
 })
 
 server.listen(cfg.port)
@@ -109,7 +121,7 @@ process.once('SIGTERM', quit)
 
 function quit () {
   server.close(() => {
-    console.log('server gracefully shutdown')
+    logger.info('server gracefully shutdown')
     process.exit(0)
   })
 }
