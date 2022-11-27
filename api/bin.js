@@ -18,6 +18,7 @@ const path = require('path')
 const assert = require('assert')
 const { createServer } = require('./server')
 const getLogger = require('./pino-logger')
+const DisabledTokens = require('./disabled-tokens')
 
 const allowedOptions = [
   {
@@ -81,7 +82,7 @@ cfg.rootpath = process.env.GUMCAST_ROOTPATH ?? cfg.rootpath ?? ''
 cfg.fileProxyHost = process.env.GUMCAST_FILE_PROXY_HOST ?? cfg.fileProxyHost ?? cfg.hostname + cfg.rootpath
 cfg.corsWhitelist = process.env.GUMCAST_CORS_WHITELIST ?? cfg.corsWhitelist
 cfg.alternateProductLookup = process.env.GUMCAST_ALTERNATE_PRODUCT_LOOKUP ?? cfg.alternateProductLookup
-cfg.disabledTokens = process.env.GUMCAST_DISABLED_TOKENS ? JSON.parse(process.env.GUMCAST_DISABLED_TOKENS) : cfg.disabledTokens ?? []
+cfg.disabledTokensURL = process.env.GUMCAST_DISABLED_TOKENS_URL ?? cfg.disabledTokensURL
 cfg.ddAPIKey = process.env.DD_API_KEY ?? cfg.ddAPIKey
 
 const logger = getLogger(cfg)
@@ -97,12 +98,19 @@ try {
   assert(cfg.rootpath != null, 'rootpath is required')
   assert(cfg.fileProxyHost, 'fileProxyHost is required')
   assert(cfg.corsWhitelist, 'corsWhitelist is required')
-  assert(cfg.disabledTokens, 'disabledTokens array is required')
+  assert(cfg.disabledTokensURL, 'disabledTokensURL array is required')
   if (cfg.nodeEnv === 'production') assert(cfg.ddAPIKey, 'ddAPIKey required in production')
 } catch (err) {
   logger.fatal(err, 'Configuration error')
   throw err
 }
+
+cfg.disabledTokenUpdater = new DisabledTokens({
+  url: cfg.disabledTokensURL,
+  logger
+})
+
+cfg.disabledTokenUpdater.start()
 
 logger.info(cfg.nodeEnv !== 'production' ? 'RUNNING IN DEBUG MODE' : 'RUNNING IN PRODUCTION MODE')
 
@@ -122,8 +130,10 @@ process.once('SIGINT', quit)
 process.once('SIGTERM', quit)
 
 function quit () {
+  cfg.disabledTokenUpdater.stop()
   server.close(() => {
     logger.info('server gracefully shutdown')
+    logger.flush()
     process.exit(0)
   })
 }

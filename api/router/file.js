@@ -86,7 +86,7 @@ function fileProxy (cfg) {
       return validationFailed(req, res, invalidParamMsg)
     }
 
-    const disabledToken = cfg.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
+    const disabledToken = cfg.disabledTokenUpdater.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
 
     if (disabledToken) {
       res.setHeader('content-type', 'application/json')

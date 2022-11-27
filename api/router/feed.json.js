@@ -74,7 +74,7 @@ function jsonfeed (cfg) {
 
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
 
-      const disabledToken = cfg.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
+      const disabledToken = cfg.disabledTokenUpdater.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
 
       const jf = await getJsonfeed(purchasedItems, {
         disabledToken,
