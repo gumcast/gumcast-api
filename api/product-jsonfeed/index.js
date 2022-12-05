@@ -148,9 +148,7 @@ async function getJsonfeed (data, opts = {}) {
       avatar: purchace.preview_url
     },
     _itunes: cleanDeep({
-      // expired: !purchace.subscription_data TODO: No longer available
-      // TODO: disable this after Nov 28
-      new_feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath })
+      block: true
     }),
     // expired: !purchace.subscription_data,
     items: await pMap(fileData || [], async (item, i) => {
