@@ -4,7 +4,7 @@ const parseurl = require('parseurl')
 const qs = require('qs')
 const { getPurchaces, getPurchaceData } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeJSON } = require('./helpers')
-const { getFileFrom, getPurchace, getProductPermalink } = require('../product-jsonfeed')
+const { getFileFrom, getPurchace, getProductPermalink, getRedirectURL } = require('../product-jsonfeed')
 const redirectChain = require('redirect-chain')({
   maxRedirects: 5
 })
@@ -204,16 +204,23 @@ function fileProxy (cfg) {
 
       const fileID = file.id
       if (fileID) res.setHeader('X-Gumcast-File-ID', fileID)
-      const tmpFileUrl = await redirectChain.destination(file.download_url)
+      const redirectURL = await getRedirectURL(file, cfg.mobile_token)
+
+      if (!redirectURL) {
+        return writeJSON(req, res, {
+          error: `file_id ${query.file_id} not media URL not found`
+        }, 404)
+      }
+
       cache.set(cacheKey, {
-        cachedURL: tmpFileUrl,
+        cachedURL: redirectURL,
         feedAuthor,
         feedTitle,
         feedHomePage,
         fileID,
         userID
       })
-      return strategeyResponse(query.strategey, tmpFileUrl)
+      return strategeyResponse(query.strategey, redirectURL)
     } catch (e) {
       return apiErrorHandler(req, res, e)
     }

@@ -46,6 +46,26 @@ function getFileFrom (purchace, fileId) {
   return purchace.file_data && purchace.file_data.find(f => f.id === fileId)
 }
 
+exports.getRedirectURL = getRedirectURL
+async function getRedirectURL (file, mobile_token) {
+  if (file?.download_url) {
+    const tmpFileURL = await redirectChain.destination(file.download_url)
+    return tmpFileURL
+  }
+  if (file?.streaming_url) {
+    const redirectTarget = `${file.streaming_url}.json?mobile_token=${mobile_token}`
+    const response = await fetch(redirectTarget)
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+      const body = await response.json()
+      return body.playlist_url
+    } else {
+      const body = await response.text()
+      throw new Error(`${response.status} ${body}`)
+    }
+  }
+  return null
+}
+
 function mimeType (item) {
   if (item.filetype === 'm4a' && item.filegroup === 'audio') return 'audio/m4a'
   if (item.filetype === 'mp3' && item.filegroup === 'audio') return 'audio/mpeg '
@@ -154,7 +174,7 @@ async function getJsonfeed (data, opts = {}) {
     items: await pMap(fileData || [], async (item, i) => {
       const feedItem = {
         id: item.id,
-        title: item.name_displayable,
+        title: isStream(item) ? `[Stream only] ${item.name_displayable}` : item.name_displayable,
         content_text: disabledToken ? disabledCopy : item.name_displayable,
         image: purchace.preview_url,
         banner_image: purchace.preview_url,
@@ -212,4 +232,8 @@ async function getRssFeed (data, opts = {}) {
     }),
     jf
   }
+}
+
+function isStream (file) {
+  return file?.streaming_url && !file?.download_url
 }
