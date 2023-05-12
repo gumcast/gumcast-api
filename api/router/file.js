@@ -87,7 +87,7 @@ function fileProxy (cfg) {
 
     if (disabledToken) {
       res.setHeader('content-type', 'application/json')
-      res.statusCode(403)
+      res.statusCode = 403
       const errBody = JSON.stringify({
         error: 'This token has been disabled because it has too many subscribers. Please log into GumCast.com and re-generate a new podcast feed. Ensure that you do not share it publiclly or add it to public podcast directories. '
       })

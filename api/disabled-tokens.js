@@ -30,6 +30,7 @@ class DisabledTokens {
       this.#disabledTokens = newTokens
       this.#logger.debug({ newTokens })
       this.#logger.info('Disabled tokens refreshed')
+      this.#logger.info({ disabledTokens: this.#disabledTokens })
     } catch (err) {
       this.#logger.error(err, 'Error updating disabled tokens')
     }

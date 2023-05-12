@@ -34,6 +34,18 @@ function jsonfeed (cfg) {
     const query = qs.parse(url.query)
     const invalidMsg = validate(query)
     if (invalidMsg) return validationFailed(req, res, invalidMsg)
+    const disabledToken = cfg.disabledTokenUpdater.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
+
+    if (disabledToken) {
+      res.setHeader('content-type', 'application/json')
+      res.statusCode = 403
+      const errBody = JSON.stringify({
+        error: 'This token has been disabled because it has too many subscribers. Please log into GumCast.com and re-generate a new podcast feed. Ensure that you do not share it publiclly or add it to public podcast directories. '
+      })
+      res.setHeader('Content-Length', Buffer.byteLength(errBody, 'utf8'))
+      res.setHeader('X-Gumcast-Disabled-Token', true)
+      return res.end(errBody)
+    }
 
     const cacheKey = getCacheKey({
       access_token: query.access_token,
@@ -73,8 +85,6 @@ function jsonfeed (cfg) {
       const userID = purchasedItems?.user_id
 
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
-
-      const disabledToken = cfg.disabledTokenUpdater.disabledTokens.some(disabledToken => query.access_token.startsWith(disabledToken))
 
       const jf = await getJsonfeed(purchasedItems, {
         disabledToken,
