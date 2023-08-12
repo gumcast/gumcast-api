@@ -1,0 +1,49 @@
+name: Rotate Fly.io App Region
+
+on:
+  schedule:
+    # Runs every hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+env:
+  node_version: 19
+  FORCE_COLOR: 1
+
+concurrency: # prevent concurrent releases
+  group: flyctl-roll-region
+  cancel-in-progress: true
+
+jobs:
+  rotate-region:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Switch to a Different Region and Scale
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          APP_NAME="gumcast-api"
+          OLD_REGION=$(fly regions list | grep 'Regions \[app\]:' | awk '{print $3}')
+
+          # Ordered list of regions
+          REGIONS=("lax" "sea" "bos" "dfw" "den" "ewr" "iad" "ord" "sjc")
+
+          # Find the next region
+          for i in "${!REGIONS[@]}"; do
+            if [[ "${REGIONS[$i]}" == "$OLD_REGION" ]]; then
+              NEW_REGION=${REGIONS[$(( (i + 1) % ${#REGIONS[@]} ))]}
+              break
+            fi
+          done
+
+          # Scale the new region to 1
+          fly scale count --region $NEW_REGION 1
+
+          # Wait for the new region to be ready (optional, add more robust logic as needed)
+          sleep 60
+
+          # Scale the old region to 0
+          fly scale count --region $OLD_REGION 0
