@@ -40,10 +40,10 @@ jobs:
           done
 
           # Scale the new region to 1
-          flyctl scale count --region $NEW_REGION 1
+          flyctl scale count --region $NEW_REGION 1 --yes
 
           # Wait for the new region to be ready (optional, add more robust logic as needed)
           sleep 60
 
           # Scale the old region to 0
-          flyctl scale count --region $OLD_REGION 0
+          flyctl scale count --region $OLD_REGION 0 --yes
