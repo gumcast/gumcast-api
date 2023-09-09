@@ -2,8 +2,8 @@ name: Rotate Fly.io App Region
 
 on:
   schedule:
-    # Runs every hour
-    - cron: '0 * * * *'
+    # Runs every 4 hours
+    - cron: '0 */4 * * *'
   workflow_dispatch: # Allows manual triggering
 
 env:
