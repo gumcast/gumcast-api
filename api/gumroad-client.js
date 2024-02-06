@@ -4,8 +4,8 @@ const bent = require('bent')
 const querystring = require('querystring')
 const assert = require('nanoassert')
 
-exports.getPurchaceData = getPurchaceData
-async function getPurchaceData ({
+exports.getPurchaseData = getPurchaseData
+async function getPurchaseData ({
   access_token,
   refresh_token,
   mobile_token,
@@ -30,8 +30,8 @@ async function getPurchaceData ({
   return get(`/url_redirects/get_url_redirect_attributes/${url_redirect_external_id}.json/?${qs.stringify(params)}`)
 }
 
-exports.getPurchaces = getPurchaces
-async function getPurchaces ({
+exports.getPurchases = getPurchases
+async function getPurchases ({
   access_token,
   refresh_token,
   mobile_token,

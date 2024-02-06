@@ -2,8 +2,8 @@
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
-const { getJsonfeed, getPurchace } = require('../product-jsonfeed')
-const { getPurchaces } = require('../gumroad-client')
+const { getJsonfeed, getPurchase } = require('../product-jsonfeed')
+const { getPurchases } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeBody, writeJSON } = require('./helpers')
 const { cache } = require('../cache')
 
@@ -75,7 +75,7 @@ function jsonfeed (cfg) {
     }
 
     try {
-      const purchasedItems = await getPurchaces({
+      const purchasedItems = await getPurchases({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
@@ -102,10 +102,10 @@ function jsonfeed (cfg) {
         alternateProductLookup: cfg.alternateProductLookup
       })
 
-      const purchace = getPurchace(purchasedItems, query.purchase_id)
+      const purchase = getPurchase(purchasedItems, query.purchase_id)
 
-      const feedAuthor = purchace?.creator_username?.replace(/[^\x00-\x7F]/g, '')
-      const feedTitle = purchace?.name?.replace(/[^\x00-\x7F]/g, '')
+      const feedAuthor = purchase?.creator_username?.replace(/[^\x00-\x7F]/g, '')
+      const feedTitle = purchase?.name?.replace(/[^\x00-\x7F]/g, '')
       const feedHomePage = jf?.home_page_url
 
       if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
@@ -124,9 +124,9 @@ function jsonfeed (cfg) {
       })
       return writeBody(req, res, jsonString)
     } catch (e) {
-      if (e.message === 'purchace_id not found') {
+      if (e.message === 'purchase_id not found') {
         return writeJSON(req, res, {
-          error: `purchace_id ${query.purchase_id} not found`
+          error: `purchase_id ${query.purchase_id} not found`
         }, 404)
       } else {
         return apiErrorHandler(req, res, e)

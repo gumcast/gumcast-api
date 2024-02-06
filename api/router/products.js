@@ -2,14 +2,14 @@
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
-const { getPurchaces } = require('../gumroad-client.js')
+const { getPurchases } = require('../gumroad-client.js')
 const get = require('lodash.get')
 
 const { apiErrorHandler, validationFailed, writeBody } = require('./helpers.js')
 const { cache } = require('../cache.js')
 
 /* eslint-disable camelcase */
-function getPurchacesCacheKey ({
+function getPurchasesCacheKey ({
   access_token,
   refresh_token,
   mobile_token,
@@ -41,7 +41,7 @@ function products (cfg) {
     if (invalidMsg) return validationFailed(req, res, invalidMsg)
 
     try {
-      const purchacesCacheKey = getPurchacesCacheKey({
+      const purchasesCacheKey = getPurchasesCacheKey({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
@@ -50,19 +50,19 @@ function products (cfg) {
 
       let purchasedItems
 
-      if (cache.get(purchacesCacheKey)) purchasedItems = cache.get(purchacesCacheKey)
+      if (cache.get(purchasesCacheKey)) purchasedItems = cache.get(purchasesCacheKey)
       else {
-        purchasedItems = await getPurchaces({
+        purchasedItems = await getPurchases({
           access_token: query.access_token,
           refresh_token: query.refresh_token,
           mobile_token: cfg.mobile_token,
           mobileApiUrl: cfg.mobileApiUrl
         })
-        cache.set(purchacesCacheKey, purchasedItems)
+        cache.set(purchasesCacheKey, purchasedItems)
       }
 
       if (purchasedItems?.user_id) res.setHeader('X-Gumcast-User-Id', purchasedItems?.user_id)
-
+      console.log({ purchasedItems })
       const filteredProductData = { ...purchasedItems }
       filteredProductData.products = filteredProductData.products.filter(p => Array.isArray(p.file_data))
 

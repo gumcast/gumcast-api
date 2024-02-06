@@ -10,21 +10,21 @@ const get = require('lodash.get')
 const redirectChain = require('redirect-chain')({
   maxRedirects: 5
 })
-const { getPurchaceData } = require('../gumroad-client')
+const { getPurchaseData } = require('../gumroad-client')
 
-exports.getPurchace = getPurchace
-function getPurchace (data, purchaseId) {
+exports.getPurchase = getPurchase
+function getPurchase (data, purchaseId) {
   return data.products.find(p => p.purchase_id === purchaseId)
 }
 
-exports.purchacesWithFileData = purchacesWithFileData
-function purchacesWithFileData (data) {
+exports.purchasesWithFileData = purchasesWithFileData
+function purchasesWithFileData (data) {
   return data.products.filter(p => p.file_data.length > 0)
 }
 
-exports.getPurchacePermalink = getPurchacePermalink
-function getPurchacePermalink (purchace) {
-  const downloadURL = get(purchace, 'file_data.0.download_url')
+exports.getPurchasePermalink = getPurchasePermalink
+function getPurchasePermalink (purchase) {
+  const downloadURL = get(purchase, 'file_data.0.download_url')
   if (!downloadURL) return null
   const u = new url.URL(downloadURL)
 
@@ -33,8 +33,8 @@ function getPurchacePermalink (purchace) {
 }
 
 exports.getProductPermalink = getProductPermalink
-function getProductPermalink (purchace) {
-  const uniquePermalink = get(purchace, 'unique_permalink')
+function getProductPermalink (purchase) {
+  const uniquePermalink = get(purchase, 'unique_permalink')
   return `https://gumroad.com/l/${uniquePermalink}`
 }
 
@@ -42,8 +42,8 @@ const gumroadFaviconSvg = 'https://assets.gumroad.com/assets/logo-70cc6d4c5ab29b
 // const gumroadFavicon = 'https://gumroad.com/favicon.ico'
 
 exports.getFileFrom = getFileFrom
-function getFileFrom (purchace, fileId) {
-  return purchace.file_data && purchace.file_data.find(f => f.id === fileId)
+function getFileFrom (purchase, fileId) {
+  return purchase.file_data && purchase.file_data.find(f => f.id === fileId)
 }
 
 exports.getRedirectURL = getRedirectURL
@@ -128,22 +128,22 @@ async function getJsonfeed (data, opts = {}) {
   assert(mobileApiUrl)
   assert(hostname)
   assert(rootpath != null)
-  const purchace = getPurchace(data, purchase_id)
-  if (!purchace) throw new Error('purchace_id not found')
-  const home_page_url = getProductPermalink(purchace) || 'https://gumroad.com'
+  const purchase = getPurchase(data, purchase_id)
+  if (!purchase) throw new Error('purchase_id not found')
+  const home_page_url = getProductPermalink(purchase) || 'https://gumroad.com'
 
-  let fileData = purchace.file_data
+  let fileData = purchase.file_data
 
   if (alternateProductLookup) {
-    const purchaceData = await getPurchaceData({
+    const purchaseData = await getPurchaseData({
       access_token,
       refresh_token,
       mobile_token,
       mobileApiUrl,
-      url_redirect_external_id: purchace.url_redirect_external_id
+      url_redirect_external_id: purchase.url_redirect_external_id
     })
 
-    fileData = purchaceData.product.file_data
+    fileData = purchaseData.product.file_data
   }
 
   if (typeof fileData?.sort === 'function') {
@@ -154,30 +154,30 @@ async function getJsonfeed (data, opts = {}) {
 
   const jsonfeed = {
     version: 'https://jsonfeed.org/version/1',
-    title: disabledToken ? `[FEED DISABLED. TOO MANY SUBSCRIBERS. PLEASE MAKE A NEW FEED AT GUMCAST.COM] ${purchace.name}` : purchace.name,
+    title: disabledToken ? `[FEED DISABLED. TOO MANY SUBSCRIBERS. PLEASE MAKE A NEW FEED AT GUMCAST.COM] ${purchase.name}` : purchase.name,
     home_page_url,
     feed_url: getJsonFeedUrl({ purchase_id, access_token, refresh_token, hostname, rootpath }),
     description: disabledToken
       ? disabledCopy
-      : striptags(purchace.description).trim(),
+      : striptags(purchase.description).trim(),
     user_comment: 'Feed generated and delivered by gumcast.com',
-    icon: purchace.preview_url || gumroadFaviconSvg,
+    icon: purchase.preview_url || gumroadFaviconSvg,
     favicon: gumroadFaviconSvg,
     author: {
-      name: purchace.creator_name,
-      avatar: purchace.preview_url
+      name: purchase.creator_name,
+      avatar: purchase.preview_url
     },
     _itunes: cleanDeep({
       block: true
     }),
-    // expired: !purchace.subscription_data,
+    // expired: !purchase.subscription_data,
     items: await pMap(fileData || [], async (item, i) => {
       const feedItem = {
         id: item.id,
         title: isStream(item) ? `[Stream only] ${item.name_displayable}` : item.name_displayable,
         content_text: disabledToken ? disabledCopy : item.name_displayable,
-        image: purchace.preview_url,
-        banner_image: purchace.preview_url,
+        image: purchase.preview_url,
+        banner_image: purchase.preview_url,
         date_published: item.created_at,
         attachments: [{
           url: item.download_url,

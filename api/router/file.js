@@ -2,9 +2,9 @@
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')
-const { getPurchaces, getPurchaceData } = require('../gumroad-client')
+const { getPurchases, getPurchaseData } = require('../gumroad-client')
 const { validationFailed, apiErrorHandler, writeJSON } = require('./helpers')
-const { getFileFrom, getPurchace, getProductPermalink, getRedirectURL } = require('../product-jsonfeed')
+const { getFileFrom, getPurchase, getProductPermalink, getRedirectURL } = require('../product-jsonfeed')
 const httpProxy = require('http-proxy')
 const promisify = require('util.promisify')
 const { cache } = require('../cache.js')
@@ -19,7 +19,7 @@ function getCacheKey ({
   return [access_token, refresh_token, purchase_id, file_id].join(';')
 }
 
-function getPurchacesCacheKey ({
+function getPurchasesCacheKey ({
   access_token,
   refresh_token,
   mobile_token,
@@ -33,7 +33,7 @@ function getPurchacesCacheKey ({
   ].join(';')
 }
 
-function getPurchaceDataCacheKey ({
+function getPurchaseDataCacheKey ({
   access_token,
   refresh_token,
   mobile_token,
@@ -123,7 +123,7 @@ function fileProxy (cfg) {
     }
 
     try {
-      const purchacesCacheKey = getPurchacesCacheKey({
+      const purchasesCacheKey = getPurchasesCacheKey({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
@@ -132,63 +132,63 @@ function fileProxy (cfg) {
 
       let purchasedItems
 
-      if (cache.get(purchacesCacheKey)) purchasedItems = cache.get(purchacesCacheKey)
+      if (cache.get(purchasesCacheKey)) purchasedItems = cache.get(purchasesCacheKey)
       else {
-        purchasedItems = await getPurchaces({
+        purchasedItems = await getPurchases({
           access_token: query.access_token,
           refresh_token: query.refresh_token,
           mobile_token: cfg.mobile_token,
           mobileApiUrl: cfg.mobileApiUrl
         })
-        cache.set(purchacesCacheKey, purchasedItems)
+        cache.set(purchasesCacheKey, purchasedItems)
       }
 
       const userID = purchasedItems?.user_id
       if (userID) res.setHeader('X-Gumcast-User-Id', userID)
 
-      const purchace = getPurchace(purchasedItems, query.purchase_id)
-      if (!purchace) {
+      const purchase = getPurchase(purchasedItems, query.purchase_id)
+      if (!purchase) {
         return writeJSON(req, res, {
-          error: `purchace_id ${query.purchace_id} not found`
+          error: `purchase_id ${query.purchase_id} not found`
         }, 404)
       }
 
-      const feedAuthor = purchace?.creator_username?.replace(/[^\x00-\x7F]/g, '')
-      const feedTitle = purchace?.name?.replace(/[^\x00-\x7F]/g, '')
-      const feedHomePage = getProductPermalink(purchace)
+      const feedAuthor = purchase?.creator_username?.replace(/[^\x00-\x7F]/g, '')
+      const feedTitle = purchase?.name?.replace(/[^\x00-\x7F]/g, '')
+      const feedHomePage = getProductPermalink(purchase)
 
       if (feedAuthor) res.setHeader('X-Gumcast-Feed-Author', feedAuthor)
       if (feedTitle) res.setHeader('X-Gumcast-Feed-Title', feedTitle)
       if (feedHomePage) res.setHeader('X-Gumcast-Feed-Home-Page', feedHomePage)
 
-      const purchaceDataCacheKey = getPurchaceDataCacheKey({
+      const purchaseDataCacheKey = getPurchaseDataCacheKey({
         access_token: query.access_token,
         refresh_token: query.refresh_token,
         mobile_token: cfg.mobile_token,
         mobileApiUrl: cfg.mobileApiUrl,
-        url_redirect_external_id: purchace.url_redirect_external_id
+        url_redirect_external_id: purchase.url_redirect_external_id
       })
 
-      let productData = purchace
+      let productData = purchase
 
       if (cfg.alternateProductLookup) {
-        if (cache.get(purchaceDataCacheKey)) productData = cache.get(purchaceDataCacheKey)
+        if (cache.get(purchaseDataCacheKey)) productData = cache.get(purchaseDataCacheKey)
         else {
-          const purchaceData = await getPurchaceData({
+          const purchaseData = await getPurchaseData({
             access_token: query.access_token,
             refresh_token: query.refresh_token,
             mobile_token: cfg.mobile_token,
             mobileApiUrl: cfg.mobileApiUrl,
-            url_redirect_external_id: purchace.url_redirect_external_id
+            url_redirect_external_id: purchase.url_redirect_external_id
           })
-          cache.set(purchaceDataCacheKey, purchaceData.product)
-          productData = purchaceData.product
+          cache.set(purchaseDataCacheKey, purchaseData.product)
+          productData = purchaseData.product
         }
       }
 
       if (!productData) {
         return writeJSON(req, res, {
-          error: `url redirect purchase data not found ${purchace.url_redirect_external_id}`
+          error: `url redirect purchase data not found ${purchase.url_redirect_external_id}`
         }, 404)
       }
 
