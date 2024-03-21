@@ -34,7 +34,7 @@
     "pino": "^8.7.0",
     "pino-datadog-transport": "^1.2.2",
     "pino-http": "^9.0.0",
-    "pino-pretty": "^10.0.0",
+    "pino-pretty": "^11.0.0",
     "qs": "^6.7.0",
     "redirect-chain": "^1.0.1",
     "striptags": "^3.1.1",
