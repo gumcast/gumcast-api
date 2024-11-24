@@ -1,6 +1,6 @@
 const assert = require('assert')
 
-const updateInterval = 5 * 60 * 1000 // 5 mins
+const updateInterval = 43200 // 12 hours
 
 class DisabledTokens {
   #url

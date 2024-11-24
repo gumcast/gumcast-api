@@ -32,19 +32,6 @@ module.exports = function getPinoLogger (cfg) {
       ? {
           targets: [
             {
-              target: path.join(__dirname, 'pino-datadog-logger.js'),
-              options: {
-                ddClientConf: {
-                  authMethods: {
-                    apiKeyAuth: process.env.DD_API_KEY
-                  }
-                },
-                service: 'gumcast-api',
-                ddsource: 'nodejs',
-                ddtags: 'env:prod,hosting:fly'
-              }
-            },
-            {
               target: 'pino-pretty',
               options: {
                 colorize: true,
