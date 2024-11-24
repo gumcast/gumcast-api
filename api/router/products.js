@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { route } = require('p-connect')
 const parseurl = require('parseurl')
 const qs = require('qs')

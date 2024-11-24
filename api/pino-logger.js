@@ -1,5 +1,4 @@
 const pino = require('pino')
-const path = require('path')
 
 const tokenPreview = 15
 const obscure = ['access_token', 'refresh_token']
