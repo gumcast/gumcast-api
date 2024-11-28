@@ -1,8 +1,16 @@
+#!/bin/bash
+
+set -e
+
 APP_NAME="gumcast-api"
-OLD_REGION=$(flyctl regions list | grep 'Regions \[app\]:' | awk '{print $3}')
+echo "App Name: $APP_NAME"
+
+OLD_REGIONS=$(flyctl regions list | grep 'Regions \[app\]:' | sed -n 's/Regions \[app\]: //p' | tr ',' '\n' | xargs)
+echo "OLD_REGIONS=$OLD_REGIONS"
 
 # Ordered list of regions
 REGIONS=("lax" "sea" "bos" "dfw" "den" "ewr" "iad" "ord" "sjc")
+echo "REGIONS=${REGIONS[@]}"
 
 # Check if REGIONS is empty
 if [ ${#REGIONS[@]} -eq 0 ]; then
@@ -10,33 +18,60 @@ if [ ${#REGIONS[@]} -eq 0 ]; then
   exit 1
 fi
 
-# If OLD_REGION is empty, bring up a machine in the first region
-if [ -z "$OLD_REGION" ]; then
-  echo "No old region found. Bringing up a machine in the first region: ${REGIONS[0]}"
+# If no old regions are found, bring up a machine in the first region
+if [ -z "$OLD_REGIONS" ]; then
+  echo "No old regions found. Bringing up a machine in the first region: ${REGIONS[0]}"
   flyctl scale count --region ${REGIONS[0]} 1 --yes
   exit 0
 fi
 
-# Find the next region
-NEW_REGION=""
-for i in "${!REGIONS[@]}"; do
-  if [[ "${REGIONS[$i]}" == "$OLD_REGION" ]]; then
-    NEW_REGION=${REGIONS[$(( (i + 1) % ${#REGIONS[@]} ))]}
+# Find the next region in REGIONS after the last region in OLD_REGIONS
+echo "Determining the next region to scale up..."
+NEXT_REGION=""
+FOUND=false
+for REGION in "${REGIONS[@]}"; do
+  # Check if the region is in OLD_REGIONS
+  if [[ "$FOUND" == true && ! " $OLD_REGIONS " =~ " $REGION " ]]; then
+    NEXT_REGION=$REGION
     break
+  fi
+
+  # Mark FOUND when a region from OLD_REGIONS is seen in REGIONS
+  if [[ " $OLD_REGIONS " =~ " $REGION " ]]; then
+    FOUND=true
   fi
 done
 
-# Check if NEW_REGION is empty or the same as OLD_REGION
-if [ -z "$NEW_REGION" ] || [ "$NEW_REGION" == "$OLD_REGION" ]; then
-  echo "No new region found or it's the same as the old region. Exiting."
+# If we didn’t find a NEXT_REGION due to wrap-around, start from the beginning of REGIONS
+if [ -z "$NEXT_REGION" ]; then
+  for REGION in "${REGIONS[@]}"; do
+    if [[ ! " $OLD_REGIONS " =~ " $REGION " ]]; then
+      NEXT_REGION=$REGION
+      break
+    fi
+  done
+fi
+
+# Log the selected NEXT_REGION
+echo "NEXT_REGION=$NEXT_REGION"
+
+# Validate NEXT_REGION
+if [ -z "$NEXT_REGION" ]; then
+  echo "No new region found. Exiting."
   exit 1
 fi
 
-# Scale the new region to 1
-flyctl scale count --region $NEW_REGION 1 --yes
+# Scale the next region to 1
+echo "Scaling up region: $NEXT_REGION"
+flyctl scale count --region $NEXT_REGION 1 --yes
 
 # Wait for the new region to be ready (optional, add more robust logic as needed)
+echo "Waiting for $NEXT_REGION to be ready..."
 sleep 60
 
-# Scale the old region to 0
-flyctl scale count --region $OLD_REGION 0 --yes
+# Scale down all old regions
+echo "Scaling down old regions..."
+for REGION in $OLD_REGIONS; do
+  echo "Scaling down region: $REGION"
+  flyctl scale count --region $REGION 0 --yes
+done
